@@ -1,90 +1,239 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Our Diary 💌</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,300;1,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-<title>Our Diary 📖</title>
+    :root {
+      --b1: #040e24;
+      --b2: #0a1e4a;
+      --b3: #185fa5;
+      --b4: #378add;
+      --b5: #85b7eb;
+      --b6: #b5d4f4;
+      --b7: #e6f1fb;
+      --text: #dceeff;
+      --muted: rgba(181,212,244,0.5);
+    }
 
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    html, body { height: 100%; overflow: hidden; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--b1); color: var(--text); }
 
-<style>
-body {
-    height: 100vh;
-    margin: 0;
-    font-family: 'Segoe UI', sans-serif;
-    background: linear-gradient(135deg, #1a1a2e, #16213e);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
+    .bg {
+      position: fixed; inset: 0; z-index: 0;
+      background:
+        radial-gradient(ellipse 60% 50% at 20% 30%, rgba(24,95,165,0.45) 0%, transparent 65%),
+        radial-gradient(ellipse 50% 60% at 80% 70%, rgba(10,30,74,0.6)   0%, transparent 65%),
+        radial-gradient(ellipse 70% 40% at 50% 100%,rgba(4,14,36,0.7)    0%, transparent 65%),
+        #040e24;
+    }
 
-/* glow */
-body::before {
-    content: "";
-    position: absolute;
-    width: 500px;
-    height: 500px;
-    background: radial-gradient(circle, rgba(168,192,255,0.15), transparent 70%);
-    filter: blur(100px);
-}
+    canvas { position: fixed; inset: 0; z-index: 1; pointer-events: none; }
 
-/* card */
-.card-box {
-    background: rgba(255,255,255,0.07);
-    backdrop-filter: blur(20px);
-    border-radius: 20px;
-    padding: 30px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-    width: 100%;
-    max-width: 350px;
-    text-align: center;
-}
+    .wrap {
+      position: relative; z-index: 10;
+      min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      padding: 24px;
+    }
 
-h1 { color: #eaeaea; }
-.subtitle { color: #b0b0b0; font-size: 14px; }
+    .card {
+      width: 100%; max-width: 420px;
+      background: rgba(255,255,255,0.05);
+      backdrop-filter: blur(28px);
+      border: 1px solid rgba(55,138,221,0.25);
+      border-radius: 32px;
+      padding: 54px 44px 50px;
+      text-align: center;
+      box-shadow: 0 0 70px rgba(24,95,165,0.3), 0 4px 32px rgba(0,0,0,0.5);
+      animation: riseIn 1s cubic-bezier(.22,1,.36,1) both;
+    }
+    @keyframes riseIn {
+      from { opacity:0; transform:translateY(30px) scale(0.97); }
+      to   { opacity:1; transform:translateY(0) scale(1); }
+    }
 
-.form-control {
-    background: rgba(255,255,255,0.1);
-    border: none;
-    color: white;
-}
+    .icon-wrap {
+      width: 74px; height: 74px;
+      margin: 0 auto 28px;
+      background: radial-gradient(circle, rgba(55,138,221,0.2), rgba(24,95,165,0.3));
+      border: 1px solid rgba(55,138,221,0.3);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2.1rem;
+      box-shadow: 0 0 36px rgba(55,138,221,0.25);
+      animation: pulse 2.4s ease infinite;
+    }
+    @keyframes pulse { 0%,100%{transform:scale(1);box-shadow:0 0 36px rgba(55,138,221,0.25)} 50%{transform:scale(1.07);box-shadow:0 0 52px rgba(55,138,221,0.4)} }
 
-.btn-custom {
-    background: linear-gradient(135deg, #a8c0ff, #fbc2eb);
-    border: none;
-    color: #1a1a2e;
-}
-</style>
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.2rem; font-weight: 700; color: #fff;
+      margin-bottom: 8px;
+      text-shadow: 0 0 50px rgba(55,138,221,0.4);
+    }
+    .subtitle {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.05rem; font-style: italic; font-weight: 300;
+      color: var(--muted); margin-bottom: 38px; line-height: 1.7;
+    }
+
+    .input-wrap { position: relative; margin-bottom: 14px; }
+    .input-wrap input {
+      width: 100%;
+      padding: 16px 52px 16px 20px;
+      border: 1px solid rgba(55,138,221,0.28);
+      border-radius: 16px;
+      background: rgba(255,255,255,0.05);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 1.4rem; letter-spacing: 0.45em;
+      color: #fff; text-align: center; outline: none;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    .input-wrap input::placeholder {
+      letter-spacing: 0.08em; font-size: 0.88rem;
+      color: rgba(181,212,244,0.25);
+    }
+    .input-wrap input:focus {
+      border-color: rgba(55,138,221,0.6);
+      box-shadow: 0 0 0 4px rgba(55,138,221,0.1), 0 0 28px rgba(55,138,221,0.15);
+    }
+    .toggle-pw {
+      position: absolute; right: 16px; top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer; font-size: 1rem; opacity: 0.35;
+      transition: opacity 0.2s;
+    }
+    .toggle-pw:hover { opacity: 0.8; }
+
+    .hint {
+      font-size: 0.72rem; letter-spacing: 0.08em;
+      color: var(--muted); margin-bottom: 28px; font-style: italic;
+    }
+
+    button {
+      width: 100%; padding: 15px; border: none; border-radius: 16px;
+      background: linear-gradient(135deg, var(--b3) 0%, var(--b4) 100%);
+      color: #fff;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.82rem; font-weight: 600;
+      letter-spacing: 0.15em; text-transform: uppercase;
+      cursor: pointer;
+      box-shadow: 0 6px 28px rgba(24,95,165,0.4);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    button:hover { transform: translateY(-2px); box-shadow: 0 10px 36px rgba(55,138,221,0.45); }
+    button:active { transform: translateY(0); }
+
+    .error {
+      margin-top: 16px; font-size: 0.8rem;
+      color: var(--b5); font-style: italic; min-height: 20px;
+    }
+    .shake { animation: shake 0.4s ease; }
+    @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-7px)} 75%{transform:translateX(7px)} }
+
+    .deco { display: flex; justify-content: center; gap: 7px; margin-top: 30px; }
+    .deco span { width: 5px; height: 5px; border-radius: 50%; opacity: 0.35; }
+    .deco span:nth-child(1){ background: var(--b4); }
+    .deco span:nth-child(2){ background: var(--b6); }
+    .deco span:nth-child(3){ background: var(--b4); }
+
+    @media(max-width:480px){ .card{ padding: 40px 26px 36px; } }
+  </style>
 </head>
-
 <body>
+<div class="bg"></div>
+<canvas id="c"></canvas>
 
-<div class="card-box">
-    <h1>Our Diary 📖</h1>
-    <p class="subtitle">Hi Mirakiii❤️</p>
-    <p class="subtitle">Every moment with you… is my favorite page</p>
+<div class="wrap">
+  <div class="card">
+    <div class="icon-wrap">💌</div>
+    <h1>Our Diary</h1>
+    <p class="subtitle">A little world made just for us.<br/>Enter to step inside ✨</p>
 
-    <input type="password" id="pass" class="form-control mt-3" placeholder="Enter password">
-
-    <button onclick="check()" class="btn btn-custom w-100 mt-3">Unlock</button>
-
-    <p id="msg" class="text-danger mt-2"></p>
-
-    <p style="font-size:12px; color:#aaa;">Only you know the password 💫</p>
+    <div class="input-wrap">
+      <input type="password" id="pw" placeholder="enter the key" maxlength="10" autofocus/>
+      <span class="toggle-pw" onclick="togglePw()">👁</span>
+    </div>
+    <p class="hint">✦ Hint: the date that changed everything</p>
+    <button onclick="tryEnter()">Open our diary →</button>
+    <p class="error" id="err"></p>
+    <div class="deco"><span></span><span></span><span></span></div>
+  </div>
 </div>
 
 <script>
-function check() {
-    let p = document.getElementById("pass").value;
-
-    if(p === "1905") {
-        window.location.href = "home.html";
-    } else {
-        document.getElementById("msg").innerText = "Wrong password";
-    }
+document.getElementById('pw').addEventListener('keydown', e => {
+  if(e.key === 'Enter') tryEnter();
+  document.getElementById('err').textContent = '';
+});
+function tryEnter(){
+  if(document.getElementById('pw').value.trim() === '1905'){
+    const card = document.querySelector('.card');
+    card.style.transition = 'all 0.5s ease';
+    card.style.opacity = '0';
+    card.style.transform = 'scale(0.95)';
+    setTimeout(() => { window.location.href = 'home.html'; }, 500);
+  } else {
+    const err = document.getElementById('err');
+    err.textContent = "That's not quite right, love 🌊";
+    err.classList.remove('shake');
+    requestAnimationFrame(() => err.classList.add('shake'));
+    document.getElementById('pw').value = '';
+    document.getElementById('pw').focus();
+  }
 }
-</script>
+function togglePw(){
+  const i = document.getElementById('pw');
+  i.type = i.type === 'password' ? 'text' : 'password';
+}
 
+// Stars + glitter
+(function(){
+  const canvas = document.getElementById('c'), ctx = canvas.getContext('2d');
+  let W, H, stars = [], glitter = [];
+  function resize(){ W = canvas.width = innerWidth; H = canvas.height = innerHeight; initStars(); }
+  function initStars(){
+    stars = [];
+    for(let i = 0; i < 200; i++) stars.push({
+      x: Math.random()*W, y: Math.random()*H,
+      r: Math.random()*1.2+0.2,
+      a: Math.random(), da: (Math.random()-0.5)*0.005
+    });
+  }
+  function spawnGlitter(){
+    glitter.push({
+      x: Math.random()*W, y: H+8,
+      vx:(Math.random()-0.5)*0.7, vy:-(Math.random()*1+0.4),
+      r: Math.random()*2+0.4,
+      life: Math.random()*110+80, age: 0
+    });
+  }
+  resize(); window.addEventListener('resize', resize);
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    stars.forEach(s=>{
+      s.a += s.da;
+      if(s.a<=0.05||s.a>=1) s.da*=-1;
+      ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+      ctx.fillStyle = `rgba(133,183,235,${s.a*0.6})`; ctx.fill();
+    });
+    if(Math.random()<0.3) spawnGlitter();
+    glitter = glitter.filter(g=>g.age<g.life);
+    glitter.forEach(g=>{
+      g.x+=g.vx; g.y+=g.vy; g.age++;
+      const a = 1-g.age/g.life;
+      ctx.beginPath(); ctx.arc(g.x,g.y,g.r,0,Math.PI*2);
+      ctx.fillStyle = `rgba(181,212,244,${a})`; ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+</script>
 </body>
 </html>
