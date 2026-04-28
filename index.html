@@ -18,8 +18,8 @@
       position:fixed; inset:0; z-index:0;
       background:
         radial-gradient(ellipse 60% 50% at 20% 30%, rgba(24,95,165,0.45) 0%, transparent 65%),
-        radial-gradient(ellipse 50% 60% at 80% 70%, rgba(10,30,74,0.6)   0%, transparent 65%),
-        radial-gradient(ellipse 70% 40% at 50% 100%,rgba(4,14,36,0.7)    0%, transparent 65%),
+        radial-gradient(ellipse 50% 60% at 80% 70%, rgba(10,30,74,0.6) 0%, transparent 65%),
+        radial-gradient(ellipse 70% 40% at 50% 100%, rgba(4,14,36,0.7) 0%, transparent 65%),
         #040e24;
     }
     canvas { position:fixed; inset:0; z-index:1; pointer-events:none; }
@@ -55,7 +55,24 @@
       50%{box-shadow:0 0 56px rgba(55,138,221,0.45)}
     }
     h1 { font-family:'Playfair Display',serif; font-size:2.2rem; font-weight:700; color:#fff; margin-bottom:8px; text-shadow:0 0 50px rgba(55,138,221,0.4); }
-    .subtitle { font-family:'Cormorant Garamond',serif; font-size:1.05rem; font-style:italic; font-weight:300; color:var(--muted); margin-bottom:38px; line-height:1.7; }
+    .subtitle { font-family:'Cormorant Garamond',serif; font-size:1.05rem; font-style:italic; font-weight:300; color:var(--muted); margin-bottom:28px; line-height:1.7; }
+
+    /* USER SELECTOR */
+    .user-select { display:flex; gap:10px; margin-bottom:22px; }
+    .user-btn {
+      flex:1; padding:12px 8px; border-radius:14px;
+      background:rgba(255,255,255,0.04); border:1px solid rgba(55,138,221,0.2);
+      color:var(--muted); font-family:'DM Sans',sans-serif; font-size:0.78rem;
+      font-weight:500; letter-spacing:0.05em; cursor:pointer;
+      transition:all 0.25s; display:flex; flex-direction:column; align-items:center; gap:4px;
+    }
+    .user-btn .u-emoji { font-size:1.4rem; }
+    .user-btn.selected {
+      background:rgba(55,138,221,0.18); border-color:rgba(55,138,221,0.55);
+      color:#fff; box-shadow:0 0 20px rgba(55,138,221,0.2);
+    }
+    .user-btn:hover { border-color:rgba(55,138,221,0.4); color:var(--b6); }
+
     .input-wrap { position:relative; margin-bottom:14px; }
     .input-wrap input {
       width:100%; padding:16px 52px 16px 20px;
@@ -70,7 +87,7 @@
     .toggle-pw { position:absolute; right:16px; top:50%; transform:translateY(-50%); cursor:pointer; font-size:1rem; opacity:0.35; transition:opacity 0.2s; }
     .toggle-pw:hover { opacity:0.8; }
     .hint { font-size:0.72rem; letter-spacing:0.08em; color:var(--muted); margin-bottom:28px; font-style:italic; }
-    button {
+    button.submit-btn {
       width:100%; padding:15px; border:none; border-radius:16px;
       background:linear-gradient(135deg,var(--b3) 0%,var(--b4) 100%);
       color:#fff; font-family:'DM Sans',sans-serif; font-size:0.82rem; font-weight:600;
@@ -78,8 +95,8 @@
       box-shadow:0 6px 28px rgba(24,95,165,0.4);
       transition:transform 0.2s,box-shadow 0.2s;
     }
-    button:hover { transform:translateY(-2px); box-shadow:0 10px 36px rgba(55,138,221,0.45); }
-    button:active { transform:translateY(0); }
+    button.submit-btn:hover { transform:translateY(-2px); box-shadow:0 10px 36px rgba(55,138,221,0.45); }
+    button.submit-btn:active { transform:translateY(0); }
     .error { margin-top:16px; font-size:0.8rem; color:var(--b5); font-style:italic; min-height:20px; }
     .shake { animation:shake 0.4s ease; }
     @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-7px)} 75%{transform:translateX(7px)} }
@@ -99,49 +116,151 @@
     <div class="icon-wrap">💌</div>
     <h1>Our Diary</h1>
     <p class="subtitle">A little world made just for us.<br/>Enter to step inside ✨</p>
+
+    <!-- USER SELECTION -->
+    <div class="user-select">
+      <button class="user-btn selected" id="btn-mirakiii" onclick="selectUser('mirakiii')">
+        <span class="u-emoji">❤️</span>
+        <span>Mirakiii</span>
+      </button>
+      <button class="user-btn" id="btn-cedric" onclick="selectUser('cedric')">
+        <span class="u-emoji">😏</span>
+        <span>Cedric</span>
+      </button>
+    </div>
+
     <div class="input-wrap">
       <input type="password" id="pw" placeholder="enter the key" maxlength="10" autofocus/>
       <span class="toggle-pw" onclick="togglePw()">👁</span>
     </div>
     <p class="hint">✦ Hint: the date that changed everything</p>
-    <button onclick="tryEnter()">Open our diary →</button>
+    <button class="submit-btn" onclick="tryEnter()">Open our diary →</button>
     <p class="error" id="err"></p>
     <div class="deco"><span></span><span></span><span></span></div>
   </div>
 </div>
 <script>
-document.getElementById('pw').addEventListener('keydown',e=>{
-  if(e.key==='Enter') tryEnter();
-  document.getElementById('err').textContent='';
+let selectedUser = 'mirakiii';
+
+function selectUser(u) {
+  selectedUser = u;
+  document.getElementById('btn-mirakiii').classList.toggle('selected', u === 'mirakiii');
+  document.getElementById('btn-cedric').classList.toggle('selected', u === 'cedric');
+  document.getElementById('pw').focus();
+  document.getElementById('err').textContent = '';
+}
+
+document.getElementById('pw').addEventListener('keydown', e => {
+  if (e.key === 'Enter') tryEnter();
+  document.getElementById('err').textContent = '';
 });
-function tryEnter(){
-  if(document.getElementById('pw').value.trim()==='1905'){
-    const card=document.querySelector('.card');
-    card.style.transition='all 0.5s ease';
-    card.style.opacity='0'; card.style.transform='scale(0.95)';
-    setTimeout(()=>{ window.location.href='home.html'; },500);
+
+function tryEnter() {
+  const val = document.getElementById('pw').value.trim();
+  if (val === '1905') {
+    // ── Store login info ──────────────────────────
+    const today = new Date();
+    const todayStr = today.toISOString().split('T')[0]; // YYYY-MM-DD
+
+    // currentUser
+    localStorage.setItem('currentUser', selectedUser);
+    localStorage.setItem('loginDate', todayStr);
+
+    // ── Streak logic (ONLY for Mirakiii) ──────────
+    if (selectedUser === 'mirakiii') {
+      const loginDays = JSON.parse(localStorage.getItem('mirakiii_loginDays') || '[]');
+      if (!loginDays.includes(todayStr)) {
+        loginDays.push(todayStr);
+        localStorage.setItem('mirakiii_loginDays', JSON.stringify(loginDays));
+      }
+      // Update streak
+      updateStreak(loginDays);
+    }
+
+    const card = document.querySelector('.card');
+    card.style.transition = 'all 0.5s ease';
+    card.style.opacity = '0';
+    card.style.transform = 'scale(0.95)';
+    setTimeout(() => { window.location.href = 'home.html'; }, 500);
   } else {
-    const err=document.getElementById('err');
-    err.textContent="That's not quite right, love 🌊";
+    const err = document.getElementById('err');
+    err.textContent = "That's not quite right, love 🌊";
     err.classList.remove('shake');
-    requestAnimationFrame(()=>err.classList.add('shake'));
-    document.getElementById('pw').value='';
+    requestAnimationFrame(() => err.classList.add('shake'));
+    document.getElementById('pw').value = '';
     document.getElementById('pw').focus();
   }
 }
-function togglePw(){ const i=document.getElementById('pw'); i.type=i.type==='password'?'text':'password'; }
+
+function updateStreak(loginDays) {
+  // Sort dates
+  const sorted = [...loginDays].sort();
+  let streak = 0;
+  let longest = 0;
+  let cur = 0;
+  const today = new Date().toISOString().split('T')[0];
+
+  for (let i = 0; i < sorted.length; i++) {
+    if (i === 0) { cur = 1; }
+    else {
+      const prev = new Date(sorted[i-1]);
+      const next = new Date(sorted[i]);
+      const diff = (next - prev) / (1000*60*60*24);
+      if (diff === 1) { cur++; }
+      else if (diff > 1) { cur = 1; }
+      // same day = no change
+    }
+    if (cur > longest) longest = cur;
+  }
+
+  // Current streak = streak ending today or yesterday
+  const lastDay = sorted[sorted.length - 1];
+  const yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1);
+  const yesterdayStr = yesterday.toISOString().split('T')[0];
+
+  // Count back from today
+  let streakCount = 0;
+  let check = new Date(today);
+  while (true) {
+    const s = check.toISOString().split('T')[0];
+    if (sorted.includes(s)) {
+      streakCount++;
+      check.setDate(check.getDate() - 1);
+    } else break;
+  }
+
+  localStorage.setItem('mirakiii_streak', streakCount);
+  localStorage.setItem('mirakiii_longestStreak', longest);
+  localStorage.setItem('mirakiii_totalLogins', loginDays.length);
+
+  // Popup trigger days
+  const popupDays = [3, 7, 15];
+  const lastPopupShown = parseInt(localStorage.getItem('mirakiii_lastPopupStreakDay') || '0');
+  for (const d of popupDays) {
+    if (streakCount >= d && lastPopupShown < d) {
+      localStorage.setItem('mirakiii_pendingPopup', d);
+      break;
+    }
+  }
+}
+
+function togglePw() {
+  const i = document.getElementById('pw');
+  i.type = i.type === 'password' ? 'text' : 'password';
+}
+
 (function(){
-  const canvas=document.getElementById('c'),ctx=canvas.getContext('2d');
-  let W,H,stars=[],glitter=[];
-  function resize(){W=canvas.width=innerWidth;H=canvas.height=innerHeight;initStars();}
-  function initStars(){ stars=[]; for(let i=0;i<200;i++) stars.push({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.2+0.2,a:Math.random(),da:(Math.random()-0.5)*0.005}); }
+  const canvas = document.getElementById('c'), ctx = canvas.getContext('2d');
+  let W, H, stars = [], glitter = [];
+  function resize(){ W = canvas.width = innerWidth; H = canvas.height = innerHeight; initStars(); }
+  function initStars(){ stars = []; for(let i=0;i<200;i++) stars.push({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.2+0.2,a:Math.random(),da:(Math.random()-0.5)*0.005}); }
   function spawnG(){ glitter.push({x:Math.random()*W,y:H+8,vx:(Math.random()-0.5)*0.7,vy:-(Math.random()*1+0.4),r:Math.random()*2+0.4,life:Math.random()*110+80,age:0}); }
-  resize(); window.addEventListener('resize',resize);
+  resize(); window.addEventListener('resize', resize);
   function draw(){
     ctx.clearRect(0,0,W,H);
     stars.forEach(s=>{ s.a+=s.da; if(s.a<=0.05||s.a>=1)s.da*=-1; ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fillStyle=`rgba(133,183,235,${s.a*0.6})`;ctx.fill(); });
     if(Math.random()<0.3) spawnG();
-    glitter=glitter.filter(g=>g.age<g.life);
+    glitter = glitter.filter(g=>g.age<g.life);
     glitter.forEach(g=>{ g.x+=g.vx;g.y+=g.vy;g.age++; const a=1-g.age/g.life; ctx.beginPath();ctx.arc(g.x,g.y,g.r,0,Math.PI*2);ctx.fillStyle=`rgba(181,212,244,${a})`;ctx.fill(); });
     requestAnimationFrame(draw);
   }
