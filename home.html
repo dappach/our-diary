@@ -34,7 +34,7 @@
       background:rgba(4,14,36,0.82); backdrop-filter:blur(22px);
       border-bottom:1px solid rgba(55,138,221,0.12);
     }
-    .nav-logo { font-family:'Playfair Display',serif; font-size:1rem; font-style:italic; color:var(--b5); margin-right:18px; opacity:0.9; }
+    .nav-logo { font-family:'Playfair Display',serif; font-size:1rem; font-style:italic; color:var(--b5); margin-right:18px; opacity:0.9; cursor:pointer; user-select:none; }
     nav a { text-decoration:none; font-size:0.72rem; font-weight:500; letter-spacing:0.12em; text-transform:uppercase; color:var(--muted); padding:7px 14px; border-radius:50px; transition:all 0.25s; white-space:nowrap; }
     nav a:hover  { color:var(--b5); background:rgba(55,138,221,0.1); }
     nav a.active { color:var(--b5); background:rgba(55,138,221,0.12); }
@@ -274,6 +274,135 @@
     /* GLITTER BURST */
     .glitter-burst { position:fixed; pointer-events:none; z-index:600; }
 
+    /* ═══ SPECIAL MOMENT ALERT ═══ */
+    .sma-wrap { max-width:680px; margin:0 auto 48px; padding:0 24px; }
+    .sma-card {
+      position:relative; border-radius:24px; overflow:hidden;
+      padding:28px 32px; text-align:center;
+      background:rgba(255,255,255,0.03);
+      border:1px solid rgba(55,138,221,0.15);
+      cursor:default; transition:all 0.4s;
+    }
+    /* Glow tiers — all blue palette */
+    .sma-card.glow-far   { box-shadow:0 0 14px rgba(55,138,221,0.08); border-color:rgba(55,138,221,0.16); }
+    .sma-card.glow-med   { box-shadow:0 0 28px rgba(55,138,221,0.22); border-color:rgba(55,138,221,0.32); animation:smaPulseMed 3s ease infinite; }
+    .sma-card.glow-close { box-shadow:0 0 50px rgba(55,138,221,0.42); border-color:rgba(55,138,221,0.58); animation:smaBreath 2s ease infinite; }
+    .sma-card.glow-today { box-shadow:0 0 80px rgba(55,138,221,0.7),0 0 140px rgba(24,95,165,0.4); border-color:rgba(133,183,235,0.8); animation:smaToday 1.6s ease infinite; cursor:pointer; }
+    @keyframes smaPulseMed  { 0%,100%{box-shadow:0 0 28px rgba(55,138,221,0.22)} 50%{box-shadow:0 0 44px rgba(55,138,221,0.38)} }
+    @keyframes smaBreath    { 0%,100%{box-shadow:0 0 50px rgba(55,138,221,0.42);transform:scale(1)} 50%{box-shadow:0 0 80px rgba(55,138,221,0.62);transform:scale(1.01)} }
+    @keyframes smaToday     { 0%,100%{box-shadow:0 0 80px rgba(55,138,221,0.7),0 0 140px rgba(24,95,165,0.4);transform:scale(1)} 50%{box-shadow:0 0 120px rgba(55,138,221,0.9),0 0 180px rgba(24,95,165,0.55);transform:scale(1.015)} }
+    .sma-lock-icon { font-size:1.6rem; margin-bottom:10px; display:block; }
+    .sma-title {
+      font-family:'Playfair Display',serif; font-size:1rem; font-weight:700;
+      color:rgba(181,212,244,0.45); letter-spacing:0.06em; margin-bottom:4px;
+    }
+    .sma-card.glow-med   .sma-title { color:rgba(181,212,244,0.65); }
+    .sma-card.glow-close .sma-title { color:rgba(181,212,244,0.85); }
+    .sma-card.glow-today .sma-title { color:#fff; font-size:1.15rem; text-shadow:0 0 30px rgba(133,183,235,0.8); }
+    .sma-sub {
+      font-family:'Cormorant Garamond',serif; font-size:0.9rem;
+      font-style:italic; color:rgba(181,212,244,0.25);
+    }
+    .sma-card.glow-med   .sma-sub { color:rgba(181,212,244,0.45); }
+    .sma-card.glow-close .sma-sub { color:rgba(181,212,244,0.65); }
+    .sma-card.glow-today .sma-sub { color:var(--b5); }
+    .sma-countdown {
+      margin-top:10px; font-size:0.65rem; letter-spacing:0.18em; text-transform:uppercase;
+      color:rgba(181,212,244,0.2);
+    }
+    .sma-card.glow-med   .sma-countdown { color:rgba(181,212,244,0.4); }
+    .sma-card.glow-close .sma-countdown { color:var(--b5); }
+    .sma-card.glow-today .sma-countdown { display:none; }
+    /* unlock shimmer on today */
+    .sma-card.glow-today::after {
+      content:''; position:absolute; inset:0;
+      background:linear-gradient(115deg, transparent 30%, rgba(55,138,221,0.1) 50%, transparent 70%);
+      animation:shimmerSMA 2.2s linear infinite;
+    }
+    @keyframes shimmerSMA { 0%{transform:translateX(-100%)} 100%{transform:translateX(200%)} }
+
+    /* ═══ ADMIN GATE ═══ */
+    #admin-gate {
+      display:none; position:fixed; inset:0; z-index:900;
+      background:rgba(4,14,36,0.97); backdrop-filter:blur(20px);
+      align-items:center; justify-content:center; padding:24px;
+    }
+    #admin-gate.show { display:flex; }
+    .admin-modal {
+      background:rgba(255,255,255,0.05); border:1px solid rgba(55,138,221,0.25);
+      border-radius:28px; padding:44px 40px; max-width:460px; width:100%; text-align:center;
+      box-shadow:0 0 60px rgba(24,95,165,0.2);
+      animation:pigModalIn 0.4s cubic-bezier(.22,1,.36,1) both;
+    }
+    .admin-modal-title { font-family:'Playfair Display',serif; font-size:1.5rem; color:#fff; margin-bottom:6px; }
+    .admin-modal-sub   { font-family:'Cormorant Garamond',serif; font-size:0.9rem; font-style:italic; color:var(--muted); margin-bottom:28px; }
+    .a-input {
+      width:100%; padding:13px 18px; border:1px solid rgba(55,138,221,0.28); border-radius:13px;
+      background:rgba(255,255,255,0.05); font-family:'DM Sans',sans-serif;
+      font-size:1rem; letter-spacing:0.2em; color:#fff; text-align:center; outline:none;
+      margin-bottom:12px; transition:border-color 0.3s;
+    }
+    .a-input:focus { border-color:rgba(55,138,221,0.6); }
+    .a-btn {
+      width:100%; padding:13px; border:none; border-radius:13px;
+      background:linear-gradient(135deg,var(--b3),var(--b4)); color:#fff;
+      font-family:'DM Sans',sans-serif; font-size:0.8rem; font-weight:600;
+      letter-spacing:0.12em; text-transform:uppercase; cursor:pointer;
+      box-shadow:0 6px 24px rgba(24,95,165,0.35); transition:transform 0.2s;
+    }
+    .a-btn:hover { transform:translateY(-2px); }
+    .a-err { margin-top:10px; font-size:0.78rem; color:var(--b5); font-style:italic; min-height:18px; }
+    .a-cancel { margin-top:14px; background:none; border:none; font-family:'DM Sans',sans-serif; font-size:0.7rem; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted); cursor:pointer; transition:color 0.2s; }
+    .a-cancel:hover { color:var(--b5); }
+
+    /* ═══ ADMIN PANEL (Special Moment only) ═══ */
+    #admin-panel {
+      display:none; position:fixed; inset:0; z-index:901;
+      background:rgba(4,14,36,0.97); overflow-y:auto;
+    }
+    #admin-panel.show { display:block; }
+    .ap-inner { max-width:520px; margin:0 auto; padding:80px 24px 60px; }
+    .ap-hdr { display:flex; justify-content:space-between; align-items:center; margin-bottom:36px; }
+    .ap-hdr-title { font-family:'Playfair Display',serif; font-size:1.4rem; color:#fff; }
+    .ap-close { background:rgba(255,255,255,0.06); border:1px solid var(--card-border); border-radius:10px; padding:8px 16px; font-size:0.7rem; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted); cursor:pointer; transition:all 0.2s; }
+    .ap-close:hover { color:var(--b5); border-color:rgba(55,138,221,0.4); }
+    .ap-sec { margin-bottom:28px; }
+    .ap-sec-title { font-size:0.62rem; font-weight:600; letter-spacing:0.22em; text-transform:uppercase; color:var(--b4); opacity:0.8; margin-bottom:14px; display:flex; align-items:center; gap:10px; }
+    .ap-sec-title::after { content:''; flex:1; height:1px; background:rgba(55,138,221,0.15); }
+    .ap-row { display:flex; align-items:center; gap:14px; margin-bottom:14px; }
+    .ap-label { font-size:0.82rem; color:var(--text); flex:1; }
+    /* toggle switch */
+    .toggle-wrap { position:relative; width:46px; height:26px; flex-shrink:0; }
+    .toggle-wrap input { opacity:0; width:0; height:0; }
+    .toggle-slider {
+      position:absolute; inset:0; border-radius:50px; cursor:pointer;
+      background:rgba(255,255,255,0.1); border:1px solid rgba(55,138,221,0.2);
+      transition:all 0.3s;
+    }
+    .toggle-slider::before {
+      content:''; position:absolute; width:18px; height:18px; border-radius:50%;
+      background:#fff; left:3px; top:3px; transition:transform 0.3s;
+    }
+    .toggle-wrap input:checked + .toggle-slider { background:var(--b3); border-color:var(--b4); }
+    .toggle-wrap input:checked + .toggle-slider::before { transform:translateX(20px); }
+    .ap-input, .ap-date {
+      width:100%; padding:11px 14px; border:1px solid rgba(55,138,221,0.25); border-radius:12px;
+      background:rgba(255,255,255,0.05); font-family:'DM Sans',sans-serif;
+      font-size:0.88rem; color:var(--text); outline:none; margin-bottom:10px;
+      transition:border-color 0.3s;
+    }
+    .ap-input:focus, .ap-date:focus { border-color:rgba(55,138,221,0.55); }
+    .ap-date { color-scheme: dark; }
+    .ap-save {
+      padding:10px 24px; border:none; border-radius:12px;
+      background:linear-gradient(135deg,var(--b3),var(--b4)); color:#fff;
+      font-family:'DM Sans',sans-serif; font-size:0.78rem; font-weight:600;
+      letter-spacing:0.1em; text-transform:uppercase; cursor:pointer;
+      box-shadow:0 4px 18px rgba(24,95,165,0.3); transition:transform 0.2s;
+    }
+    .ap-save:hover { transform:translateY(-2px); }
+    .ap-ok { font-size:0.75rem; color:var(--b5); font-style:italic; min-height:16px; margin-top:7px; }
+
     @media(max-width:600px){
       .ci{padding:14px 14px} .notes-card{padding:36px 24px}
       .nav-logo{display:none} nav a{padding:6px 10px;font-size:0.65rem}
@@ -281,6 +410,7 @@
       .ach-card{padding:16px 10px}
       .ach-val{font-size:1.2rem}
       .cal-card{padding:24px 16px}
+      .sma-card{padding:22px 18px}
     }
   </style>
 </head>
@@ -293,7 +423,6 @@
   <span class="nav-logo">Our Diary ♡</span>
   <a href="home.html" class="active">Home</a>
   <a href="story.html">Our Story</a>
-  <a href="album.html">Photo Album</a>
   <a href="jar.html">For My Mirakiii</a>
   <a href="hidden.html">✦ Hidden</a>
   <div class="nav-streak" id="nav-streak">🔥 <span id="streak-num">0</span></div>
@@ -317,18 +446,23 @@
   </section>
 
   <div class="sh"><span>✦ &nbsp; pages of us &nbsp; ✦</span></div>
+
+  <!-- SPECIAL MOMENT ALERT (below counter, above cards) -->
+  <div class="sma-wrap" id="sma-wrap" style="display:none">
+    <div class="sma-card" id="sma-card" onclick="smaClick()">
+      <span class="sma-lock-icon" id="sma-icon">🔒</span>
+      <div class="sma-title" id="sma-title">Something special is waiting…</div>
+      <div class="sma-sub" id="sma-sub">Not yet time…</div>
+      <div class="sma-countdown" id="sma-countdown"></div>
+    </div>
+  </div>
+
   <div class="cards">
     <a class="card" href="story.html">
       <span class="card-emoji">📖</span>
       <div class="card-title">Our Story</div>
       <div class="card-desc">From the very first hello to every quiet moment since — our timeline, written just for us.</div>
       <div class="card-lnk">Read our story <span>→</span></div>
-    </a>
-    <a class="card v2" href="album.html">
-      <span class="card-emoji">📷</span>
-      <div class="card-title">Photo Album</div>
-      <div class="card-desc">Every photo we've taken together — our memories, held gently in one beautiful place.</div>
-      <div class="card-lnk">Open album <span>→</span></div>
     </a>
     <a class="card jar" href="jar.html">
       <span class="card-emoji">🫙</span>
@@ -410,6 +544,47 @@
     <div class="pig-btns" id="pig-btns">
       <button class="pig-btn-yes" id="pig-yes" onclick="pigYes()">YES 💖</button>
       <button class="pig-btn-no" id="pig-no" onclick="pigNo()">NO 😒</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN GATE -->
+<div id="admin-gate">
+  <div class="admin-modal">
+    <p class="admin-modal-title">🔐 Admin</p>
+    <p class="admin-modal-sub">only you know the way in</p>
+    <input type="password" class="a-input" id="admin-pw" placeholder="password" maxlength="30"/>
+    <button class="a-btn" onclick="tryAdmin()">Enter →</button>
+    <p class="a-err" id="admin-err"></p>
+    <button class="a-cancel" onclick="closeAdminGate()">cancel</button>
+  </div>
+</div>
+
+<!-- ADMIN PANEL -->
+<div id="admin-panel">
+  <div class="ap-inner">
+    <div class="ap-hdr">
+      <p class="ap-hdr-title">⚙️ Special Moment</p>
+      <button class="ap-close" onclick="closeAdminPanel()">✕ Close</button>
+    </div>
+
+    <div class="ap-sec">
+      <p class="ap-sec-title">✨ Special Moment Control</p>
+      <div class="ap-row">
+        <span class="ap-label">Show alert on homepage</span>
+        <label class="toggle-wrap">
+          <input type="checkbox" id="sma-toggle" onchange="saveAdmin()"/>
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <input type="text" class="ap-input" id="sma-moment-title" placeholder="Title (e.g. Birthday, Anniversary…)" oninput="saveAdmin()"/>
+      <input type="date" class="ap-date" id="sma-moment-date" oninput="saveAdmin()"/>
+      <p style="font-size:0.75rem;color:var(--muted);font-style:italic;margin-bottom:14px;line-height:1.6">
+        The alert glows brighter as the date approaches.<br/>
+        On the day it fully unlocks ✨
+      </p>
+      <button class="ap-save" onclick="saveAdmin()">Save Changes</button>
+      <p class="ap-ok" id="ap-ok"></p>
     </div>
   </div>
 </div>
@@ -707,6 +882,134 @@ document.head.appendChild(glitterKF);
 
 // Check popup on load
 checkPigPopup();
+
+// ─── SPECIAL MOMENT ALERT ───────────────────────────────
+function getSMAConfig() {
+  try { return JSON.parse(localStorage.getItem('sma_config') || 'null'); } catch { return null; }
+}
+function saveSMAConfig(cfg) {
+  localStorage.setItem('sma_config', JSON.stringify(cfg));
+}
+
+function initSMA() {
+  const cfg = getSMAConfig();
+  if (!cfg || !cfg.enabled || !cfg.date) {
+    document.getElementById('sma-wrap').style.display = 'none';
+    return;
+  }
+  document.getElementById('sma-wrap').style.display = 'block';
+
+  const card       = document.getElementById('sma-card');
+  const icon       = document.getElementById('sma-icon');
+  const titleEl    = document.getElementById('sma-title');
+  const subEl      = document.getElementById('sma-sub');
+  const countdown  = document.getElementById('sma-countdown');
+
+  const eventDate = new Date(cfg.date + 'T00:00:00');
+  const now       = new Date();
+  // Days difference (floor so "day of" = 0)
+  const diffMs    = eventDate - now;
+  const diffDays  = Math.ceil(diffMs / (1000*60*60*24));
+
+  if (diffDays <= 0) {
+    // TODAY
+    card.className = 'sma-card glow-today';
+    icon.textContent  = '✨';
+    titleEl.textContent = "It's your day… 💖";
+    subEl.textContent   = 'Tap to see what I kept for you…';
+    countdown.style.display = 'none';
+  } else if (diffDays <= 4) {
+    card.className = 'sma-card glow-close';
+    icon.textContent  = '🔒';
+    titleEl.textContent = 'Something special is waiting…';
+    subEl.textContent   = 'Almost time…';
+    countdown.textContent = diffDays + (diffDays === 1 ? ' day away' : ' days away');
+  } else if (diffDays <= 9) {
+    card.className = 'sma-card glow-med';
+    icon.textContent  = '🔒';
+    titleEl.textContent = 'Something special is waiting…';
+    subEl.textContent   = 'Not yet time…';
+    countdown.textContent = diffDays + ' days away';
+  } else {
+    card.className = 'sma-card glow-far';
+    icon.textContent  = '🔒';
+    titleEl.textContent = 'Something special is waiting…';
+    subEl.textContent   = 'Not yet time…';
+    countdown.textContent = diffDays + ' days away';
+  }
+}
+
+function smaClick() {
+  const cfg = getSMAConfig();
+  if (!cfg || !cfg.enabled || !cfg.date) return;
+  const eventDate = new Date(cfg.date + 'T00:00:00');
+  const now = new Date();
+  const diffDays = Math.ceil((eventDate - now) / (1000*60*60*24));
+  if (diffDays <= 0) {
+    window.location.href = 'story.html#special';
+  }
+}
+
+initSMA();
+
+// ─── ADMIN SYSTEM ───────────────────────────────────────
+const ADMIN_PASS = 'cedric1905';
+let adminTapCount = 0, adminTapTimer = null;
+
+document.querySelector('.nav-logo').addEventListener('click', () => {
+  adminTapCount++;
+  clearTimeout(adminTapTimer);
+  adminTapTimer = setTimeout(() => adminTapCount = 0, 1800);
+  if (adminTapCount >= 5) {
+    adminTapCount = 0;
+    openAdminGate();
+  }
+});
+
+function openAdminGate() {
+  const gate = document.getElementById('admin-gate');
+  gate.classList.add('show');
+  document.getElementById('admin-pw').value = '';
+  document.getElementById('admin-err').textContent = '';
+  setTimeout(() => document.getElementById('admin-pw').focus(), 80);
+}
+function closeAdminGate() {
+  document.getElementById('admin-gate').classList.remove('show');
+}
+document.getElementById('admin-pw').addEventListener('keydown', e => {
+  if (e.key === 'Enter') tryAdmin();
+});
+function tryAdmin() {
+  if (document.getElementById('admin-pw').value === ADMIN_PASS) {
+    closeAdminGate();
+    openAdminPanel();
+  } else {
+    document.getElementById('admin-err').textContent = 'wrong password ✗';
+    document.getElementById('admin-pw').value = '';
+  }
+}
+function openAdminPanel() {
+  const cfg = getSMAConfig() || { enabled: false, title: '', date: '' };
+  document.getElementById('sma-toggle').checked = !!cfg.enabled;
+  document.getElementById('sma-moment-title').value = cfg.title || '';
+  document.getElementById('sma-moment-date').value  = cfg.date  || '';
+  document.getElementById('admin-panel').classList.add('show');
+}
+function closeAdminPanel() {
+  document.getElementById('admin-panel').classList.remove('show');
+  initSMA(); // refresh alert
+}
+function saveAdmin() {
+  const cfg = {
+    enabled : document.getElementById('sma-toggle').checked,
+    title   : document.getElementById('sma-moment-title').value.trim(),
+    date    : document.getElementById('sma-moment-date').value,
+  };
+  saveSMAConfig(cfg);
+  const ok = document.getElementById('ap-ok');
+  ok.textContent = '✓ saved!';
+  setTimeout(() => ok.textContent = '', 2000);
+}
 
 // ─── BG ANIMATIONS ──────────────────────────────────────
 (function(){
