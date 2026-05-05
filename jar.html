@@ -21,7 +21,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--b1);color:var(--text);min
 canvas.bg-c{position:fixed;inset:0;z-index:1;pointer-events:none}
 
 /* ── NAV ── */
-nav{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;justify-content:center;align-items:center;gap:2px;padding:12px 20px;background:rgba(4,14,36,.92);backdrop-filter:blur(22px);border-bottom:1px solid rgba(55,138,221,.1)}
+nav{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;justify-content:flex-start;align-items:center;gap:2px;padding:12px 20px;background:rgba(4,14,36,.92);backdrop-filter:blur(22px);border-bottom:1px solid rgba(55,138,221,.1)}
 .nav-logo{font-family:'Playfair Display',serif;font-size:.95rem;font-style:italic;color:var(--b5);margin-right:14px;opacity:.9;cursor:pointer;user-select:none}
 nav a{text-decoration:none;font-size:.7rem;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);padding:6px 12px;border-radius:50px;transition:all .25s;white-space:nowrap}
 nav a:hover{color:var(--b5);background:rgba(55,138,221,.1)}
@@ -269,6 +269,7 @@ audio{width:100%;accent-color:#b8860b}
 
 @keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
 @keyframes popIn{from{transform:scale(0)}to{transform:scale(1)}}
+@keyframes lockedFloat{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-8px) rotate(2deg)}}
 footer{position:relative;z-index:10;text-align:center;padding:36px 24px;border-top:1px solid rgba(55,138,221,.08)}
 footer p{font-family:'Cormorant Garamond',serif;font-size:1rem;font-style:italic;font-weight:300;color:var(--muted);line-height:2}
 .hb{display:inline-block;animation:hb 1.5s ease infinite;color:var(--b5)}
@@ -392,7 +393,7 @@ footer p{font-family:'Cormorant Garamond',serif;font-size:1rem;font-style:italic
     </svg>
   </div>
 
-  <div class="home-btns">
+  <div class="home-btns" id="home-btns-wrap">
     <button class="btn-main btn-feel" onclick="showScreen('category')">🎛️ &nbsp; I feel…</button>
     <button class="btn-main btn-magic" onclick="magicPick()">🎲 &nbsp; Pick for me</button>
     <button class="btn-worst" onclick="showWorst()">having the worst day… 🥺</button>
@@ -400,6 +401,20 @@ footer p{font-family:'Cormorant Garamond',serif;font-size:1rem;font-style:italic
   <div class="prog-wrap">
     <div class="prog-label"><span>Messages opened</span><span id="prog-nums">0 / 0</span></div>
     <div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+  </div>
+
+  <!-- LOCKED JAR MESSAGE -->
+  <div id="jar-locked-msg" style="display:none;max-width:300px;margin-top:24px;text-align:center">
+    <div style="font-size:3rem;margin-bottom:14px;filter:grayscale(0.3);animation:lockedFloat 3s ease-in-out infinite">🫙</div>
+    <p style="font-family:'Playfair Display',serif;font-size:1.1rem;font-style:italic;color:var(--b6);margin-bottom:10px;line-height:1.7">
+      You opened every little piece of me…<br/>and I am so glad you did 💙
+    </p>
+    <p style="font-family:'Cormorant Garamond',serif;font-size:.95rem;font-style:italic;color:var(--muted);line-height:1.7;margin-bottom:22px">
+      The jar is resting now…<br/>but I'm already filling it back up for you ✨
+    </p>
+    <p style="font-size:.68rem;letter-spacing:.15em;text-transform:uppercase;color:rgba(55,138,221,.4)">
+      — come back soon —
+    </p>
   </div>
 </div>
 
@@ -574,6 +589,11 @@ footer p{font-family:'Cormorant Garamond',serif;font-size:1rem;font-style:italic
     <div class="asec"><p class="asec-title">🔒 Worst Day Note</p>
       <textarea class="a-locked" id="edit-locked"></textarea>
       <button class="a-save" onclick="saveLockedNote()">Save</button><p class="a-ok" id="ok-locked"></p>
+    </div>
+    <div class="asec"><p class="asec-title">🔄 Jar Reset</p>
+      <p style="font-size:.82rem;color:var(--muted);font-style:italic;margin-bottom:12px;line-height:1.6">When she opens all messages the jar locks. Reset it here so she can start fresh — messages are kept, just the count resets.</p>
+      <button class="a-save" onclick="adminResetJar()" style="background:linear-gradient(135deg,#8b2a44,#c0304a)">🔄 Reset Jar (Fresh Start)</button>
+      <p class="a-ok" id="ok-reset"></p>
     </div>
     <div class="asec"><p class="asec-title">🍽️ Food Reward Menu</p>
       <div id="food-admin-list"></div>
@@ -945,7 +965,8 @@ function recordOpen(cat){
   hist[key].msgs++;
   if(!hist[key].cats.includes(cat))hist[key].cats.push(cat);
   sd('jar_history',hist);
-  sd('jar_opened_count',(getOpenedCount()||0)+1);
+  const newCount = (getOpenedCount()||0)+1;
+  sd('jar_opened_count', newCount);
 }
 function recordGiftClaim(food){
   const gh=getGiftHistory();
@@ -969,11 +990,44 @@ updateProgress();
 function checkCompletion(){
   const total=getTotalMsgs(),opened=getOpenedCount();
   if(total>0&&opened>=total){
+    // Mark jar as completed — will show broken/locked state
+    sd('jar_completed',true);
     setTimeout(()=>{
       document.getElementById('letter-screen').classList.remove('show');
       glitterBurst();
       setTimeout(()=>document.getElementById('completion-screen').classList.add('show'),700);
     },2000);
+  }
+}
+
+function isJarCompleted(){ return gd('jar_completed',false); }
+
+function resetJar(){
+  // Reset opened count only — keep messages (admin keeps them)
+  // But also clear the used-pool tracking so she gets fresh messages
+  sd('jar_opened_count',0);
+  sd('jar_completed',false);
+  Object.keys(catPools).forEach(k=>delete catPools[k]);
+  updateProgress();
+  renderLockedJarState(false);
+}
+
+function renderLockedJarState(locked){
+  const scene = document.getElementById('jar-scene');
+  const homeBtns = document.getElementById('home-btns-wrap');
+  const lockedMsg = document.getElementById('jar-locked-msg');
+  if(locked){
+    scene.style.filter='grayscale(0.7) brightness(0.55)';
+    scene.style.cursor='default';
+    scene.onclick=null;
+    if(lockedMsg) lockedMsg.style.display='block';
+    if(homeBtns) homeBtns.style.display='none';
+  } else {
+    scene.style.filter='';
+    scene.style.cursor='pointer';
+    scene.onclick=function(){jarClick()};
+    if(lockedMsg) lockedMsg.style.display='none';
+    if(homeBtns) homeBtns.style.display='flex';
   }
 }
 function glitterBurst(){
@@ -1219,6 +1273,33 @@ function renderFoodAdmin(){const foods=getFoods(),wrap=document.getElementById('
 function toggleFood(i,key,val){const f=getFoods();f[i][key]=val;sd('jar_food',f)}
 function deleteFood(i){const f=getFoods();f.splice(i,1);sd('jar_food',f);renderFoodAdmin()}
 function addFoodItem(){const emoji=document.getElementById('new-food-emoji').value.trim()||'🍬',name=document.getElementById('new-food-name').value.trim();if(!name)return;const f=getFoods();f.push({emoji,name,enabled:true,deliverToday:false,voice:null});sd('jar_food',f);document.getElementById('new-food-emoji').value='';document.getElementById('new-food-name').value='';ok('ok-food','✓ added!');renderFoodAdmin()}
+
+// ── ADMIN RESET JAR ──
+function adminResetJar(){
+  resetJar();
+  ok('ok-reset','✅ Jar reset! She can open all messages again.');
+}
+
+// ── INIT LOCKED STATE ON LOAD ──
+if(isJarCompleted()){
+  // Check if count still exceeds total (might have been fixed)
+  const total=getTotalMsgs(),opened=getOpenedCount();
+  if(opened>=total && total>0){
+    // Still completed — show locked
+    setTimeout(()=>renderLockedJarState(true),200);
+  } else {
+    // Count was wrong — auto-fix
+    if(opened>total && total>0) sd('jar_opened_count',total);
+    sd('jar_completed',false);
+  }
+} else {
+  // Also guard against over-count bug (22/21 case)
+  const total=getTotalMsgs(),opened=getOpenedCount();
+  if(total>0 && opened>total){
+    sd('jar_opened_count',total);
+    updateProgress();
+  }
+}
 
 // ── BG STARS ──
 (function(){
