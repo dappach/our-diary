@@ -274,6 +274,18 @@
     /* GLITTER BURST */
     .glitter-burst { position:fixed; pointer-events:none; z-index:600; }
 
+    /* PIG CRY + TEAR FALL */
+    @keyframes pigCry {
+      0%,100%{transform:rotate(-3deg) translateY(2px)}
+      50%{transform:rotate(3deg) translateY(6px)}
+    }
+    @keyframes tearFall {
+      0%{transform:translateY(0) scale(1);opacity:1}
+      100%{transform:translateY(80px) scale(0.5);opacity:0}
+    }
+    /* NO button running animation */
+    #pig-no { transition:left 0.15s ease, top 0.15s ease; }
+
     /* ═══ SPECIAL MOMENT ALERT ═══ */
     .sma-wrap { max-width:680px; margin:0 auto 48px; padding:0 24px; }
     .sma-card {
@@ -593,10 +605,39 @@
 // ─── DATA ───────────────────────────────────────────────
 const currentUser = localStorage.getItem('currentUser') || 'mirakiii';
 const loginDays   = JSON.parse(localStorage.getItem('mirakiii_loginDays') || '[]');
-const streak      = parseInt(localStorage.getItem('mirakiii_streak') || '0');
-const longest     = parseInt(localStorage.getItem('mirakiii_longestStreak') || '0');
-const totalLogins = parseInt(localStorage.getItem('mirakiii_totalLogins') || '0');
-const START       = new Date(2024, 10, 22); // Nov 22 2024
+const START       = new Date(2024, 10, 22);
+
+// Recalculate real current streak from loginDays
+function calcCurrentStreak(days) {
+  if (!days.length) return 0;
+  const sorted = [...new Set(days)].sort();
+  const todayStr = new Date().toISOString().split('T')[0];
+  const yestStr  = new Date(Date.now()-86400000).toISOString().split('T')[0];
+  const last = sorted[sorted.length-1];
+  if (last !== todayStr && last !== yestStr) return 0;
+  let count = 0;
+  for (let i = sorted.length-1; i >= 0; i--) {
+    if (i === sorted.length-1) { count=1; continue; }
+    const diff = (new Date(sorted[i+1]) - new Date(sorted[i])) / 86400000;
+    if (diff === 1) count++; else break;
+  }
+  return count;
+}
+function calcLongestStreak(days) {
+  if (!days.length) return 0;
+  const sorted = [...new Set(days)].sort();
+  let max=1,cur=1;
+  for (let i=1;i<sorted.length;i++) {
+    const diff=(new Date(sorted[i])-new Date(sorted[i-1]))/86400000;
+    if(diff===1){cur++;max=Math.max(max,cur);}else cur=1;
+  }
+  return max;
+}
+const streak      = calcCurrentStreak(loginDays);
+const longest     = Math.max(calcLongestStreak(loginDays), parseInt(localStorage.getItem('mirakiii_longestStreak')||'0'));
+const totalLogins = loginDays.length || parseInt(localStorage.getItem('mirakiii_totalLogins')||'0');
+localStorage.setItem('mirakiii_streak', streak);
+localStorage.setItem('mirakiii_longestStreak', longest);
 
 // ─── COUNTER ────────────────────────────────────────────
 function tick(){
@@ -771,6 +812,7 @@ function showPigPopup(days) {
   // Reset state
   pigNoCount = 0;
   if (pigNoMoveInterval) clearInterval(pigNoMoveInterval);
+  pigNoBehavior = Math.floor(Math.random() * 3); // pick random behavior 0,1,2
   pigChar.className = 'pig-char';
   pigChar.textContent = '🐷';
   yesBtn.style.transform = '';
@@ -778,6 +820,15 @@ function showPigPopup(days) {
   noBtn.style.position   = '';
   noBtn.style.transform  = '';
   noBtn.style.transition = '';
+  noBtn.style.display    = '';
+  noBtn.style.opacity    = '';
+  noBtn.style.left       = '';
+  noBtn.style.top        = '';
+  // Remove any lingering escape handler
+  if (noBtn._escapeHandler) {
+    document.removeEventListener('mousemove', noBtn._escapeHandler);
+    noBtn._escapeHandler = null;
+  }
   dialogue.innerHTML = `Ahhh mirakiii kuttiii 🥺<br/>You came for <strong>${days}</strong> days straight…<br/>so you like me right? 😏`;
   badge.textContent = '🔥 ' + days + ' days straight!';
 
@@ -819,41 +870,118 @@ function pigYes() {
   nav.classList.add('pulse');
   setTimeout(() => nav.classList.remove('pulse'), 700);
 
+  // Cleanup any running NO behavior
+  const noBtn = document.getElementById('pig-no');
+  if (noBtn && noBtn._escapeHandler) {
+    document.removeEventListener('mousemove', noBtn._escapeHandler);
+    noBtn._escapeHandler = null;
+  }
+
   // Close + sparkles dissolve
   setTimeout(() => {
     document.getElementById('pig-overlay').classList.remove('show');
   }, 2200);
 }
 
+// Which NO behavior to use this popup session (random per popup)
+let pigNoBehavior = 0;
+
 function pigNo() {
   pigNoCount++;
   const pigChar  = document.getElementById('pig-char');
   const dialogue = document.getElementById('pig-dialogue');
-  const btns     = document.getElementById('pig-btns');
+  const yesBtn   = document.getElementById('pig-yes');
+  const noBtn    = document.getElementById('pig-no');
 
-  // Sad pig
+  // Sad pig animation always
   pigChar.style.animation = 'none';
   void pigChar.offsetWidth;
   pigChar.style.animation = 'pigSad 0.5s ease both';
-  dialogue.innerHTML = "So you don't like me…? 😞<br/><span style='font-size:0.85rem;color:var(--muted)'>Try again…</span>";
 
-  // Move NO button randomly, grow YES button
-  const yesBtn = document.getElementById('pig-yes');
-  const noBtn  = document.getElementById('pig-no');
-  if (yesBtn) yesBtn.style.fontSize = (0.85 + pigNoCount * 0.12) + 'rem';
-  if (noBtn) {
-    noBtn.style.position = 'relative';
-    const dx = (Math.random() - 0.5) * 140;
-    const dy = (Math.random() - 0.5) * 60;
-    noBtn.style.transition = 'transform 0.3s ease';
-    noBtn.style.transform = `translate(${dx}px, ${dy}px)`;
+  if (pigNoBehavior === 0) {
+    // ── BEHAVIOR 1: NO button RUNS AWAY from cursor (teleports near cursor) ──
+    dialogue.innerHTML = "Nope! You can't click that 😏<br/><span style='font-size:0.82rem;color:var(--muted)'>The NO button doesn't want to be clicked…</span>";
+    if (noBtn) {
+      noBtn.style.position = 'fixed';
+      noBtn.style.zIndex = '9999';
+      noBtn.style.transition = 'left 0.15s ease, top 0.15s ease';
+      // Attach mouseover escape handler
+      noBtn._escapeHandler = function(e) {
+        const margin = 80;
+        let nx = e.clientX + margin + Math.random()*80;
+        let ny = e.clientY + margin + Math.random()*60;
+        // keep on screen
+        nx = Math.min(Math.max(nx, 60), window.innerWidth - 100);
+        ny = Math.min(Math.max(ny, 60), window.innerHeight - 60);
+        noBtn.style.left = nx + 'px';
+        noBtn.style.top  = ny + 'px';
+      };
+      document.addEventListener('mousemove', noBtn._escapeHandler);
+      // Initial position
+      noBtn.style.left = (window.innerWidth/2 + 80) + 'px';
+      noBtn.style.top  = (window.innerHeight/2) + 'px';
+    }
+  } else if (pigNoBehavior === 1) {
+    // ── BEHAVIOR 2: YES grows BIG and eventually engulfs NO ──
+    dialogue.innerHTML = "Hmm… are you sure? 😏<br/><span style='font-size:0.82rem;color:var(--muted)'>YES is getting bigger every time…</span>";
+    if (yesBtn) {
+      const newSize = 1 + pigNoCount * 0.22;
+      yesBtn.style.transform = `scale(${Math.min(newSize, 3.5)})`;
+      yesBtn.style.transition = 'transform 0.4s cubic-bezier(.22,1,.36,1)';
+      yesBtn.style.zIndex = '10';
+    }
+    if (noBtn && pigNoCount >= 4) {
+      // YES has fully engulfed NO — hide it
+      noBtn.style.opacity = Math.max(0, 1 - (pigNoCount-3)*0.4) + '';
+      noBtn.style.transform = `scale(${Math.max(0, 1-(pigNoCount-3)*0.3)})`;
+      noBtn.style.transition = 'all 0.4s ease';
+      if (pigNoCount >= 6) noBtn.style.display = 'none';
+    }
+  } else {
+    // ── BEHAVIOR 3: PIG CRIES AND MAKES A MESS ──
+    const cryFaces = ['😢','😭','🥹','😿'];
+    const messEmojis = ['💧','😭','🌊','💦'];
+    pigChar.textContent = cryFaces[Math.min(pigNoCount-1, cryFaces.length-1)];
+    pigChar.style.animation = 'pigCry 0.4s ease infinite';
+    if (pigNoCount === 1) {
+      dialogue.innerHTML = "So you don't like me…? 😢<br/><span style='font-size:0.82rem;color:var(--muted)'>I'm fine… totally fine…</span>";
+    } else if (pigNoCount === 2) {
+      dialogue.innerHTML = "You really don't like me 😭<br/><span style='font-size:0.82rem;color:var(--muted)'>*pig sobs loudly*</span>";
+      spawnTears();
+    } else {
+      dialogue.innerHTML = "THE MESS I'M MAKING 😭💦<br/><span style='font-size:0.82rem;color:var(--muted)'>everything is wet and I am not okay</span>";
+      spawnTears(); spawnTears();
+    }
   }
 
-  // After a moment, re-ask
+  // After a moment, re-ask with pig going back to normal
   setTimeout(() => {
-    pigChar.style.animation = 'pigIdle 1.8s ease infinite';
-    dialogue.innerHTML = "Ahhh really?? 🥺<br/>Come on… just say yes already 😏";
-  }, 1400);
+    if (pigNoBehavior !== 2) {
+      pigChar.textContent = '🐷';
+      pigChar.style.animation = 'pigIdle 1.8s ease infinite';
+    }
+    if (pigNoBehavior === 0) {
+      dialogue.innerHTML = "Come on… the YES button misses you 😏";
+    } else if (pigNoBehavior === 1) {
+      dialogue.innerHTML = "Look at YES growing… it knows you want to 😏";
+    }
+  }, 1600);
+}
+
+function spawnTears() {
+  const modal = document.getElementById('pig-modal');
+  const rect  = modal.getBoundingClientRect();
+  for (let i = 0; i < 12; i++) {
+    const t = document.createElement('div');
+    const x = rect.left + Math.random() * rect.width;
+    const y = rect.top  + Math.random() * rect.height * 0.5;
+    t.style.cssText = `position:fixed;left:${x}px;top:${y}px;font-size:${0.9+Math.random()*0.8}rem;
+      pointer-events:none;z-index:9999;animation:tearFall ${0.6+Math.random()*0.8}s ease forwards;
+      animation-delay:${Math.random()*0.3}s;`;
+    t.textContent = ['💧','😭','💦'][Math.floor(Math.random()*3)];
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 1500);
+  }
 }
 
 function launchGlitter() {
