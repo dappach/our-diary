@@ -6,449 +6,286 @@
   <title>Secret Night ✨</title>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
   <style>
-    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
-    :root {
-      --b1:#040e24; --b2:#0a1e4a; --b3:#185fa5;
-      --b4:#378add; --b5:#85b7eb; --b6:#b5d4f4;
-      --text:#dceeff; --muted:rgba(181,212,244,0.5);
-      --card-bg:rgba(255,255,255,0.04);
-      --card-border:rgba(55,138,221,0.18);
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    :root{
+      --b1:#040e24;--b2:#0a1e4a;--b3:#185fa5;
+      --b4:#378add;--b5:#85b7eb;--b6:#b5d4f4;
+      --text:#dceeff;--muted:rgba(181,212,244,0.5);
+      --card-bg:rgba(255,255,255,0.04);--card-border:rgba(55,138,221,0.18);
     }
-    html { scroll-behavior:smooth; }
-    body { font-family:'DM Sans',sans-serif; background:var(--b1); color:var(--text); min-height:100vh; overflow-x:hidden; }
+    html{scroll-behavior:smooth;}
+    body{font-family:'DM Sans',sans-serif;background:var(--b1);color:var(--text);min-height:100vh;overflow-x:hidden;}
+    .bg{position:fixed;inset:0;z-index:0;background:
+      radial-gradient(ellipse 60% 50% at 15% 25%,rgba(24,95,165,.45) 0%,transparent 65%),
+      radial-gradient(ellipse 50% 60% at 85% 75%,rgba(10,30,74,.55) 0%,transparent 65%),
+      radial-gradient(ellipse 70% 40% at 50% 100%,rgba(4,14,36,.65) 0%,transparent 65%),
+      #040e24;}
+    canvas#stars,canvas#glitter{position:fixed;inset:0;z-index:1;pointer-events:none;}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes riseIn{from{opacity:0;transform:translateY(28px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+    @keyframes popIn{from{transform:scale(.7);opacity:0}to{transform:scale(1);opacity:1}}
 
-    .bg {
-      position:fixed; inset:0; z-index:0;
-      background:
-        radial-gradient(ellipse 60% 50% at 15% 25%, rgba(24,95,165,0.45) 0%,transparent 65%),
-        radial-gradient(ellipse 50% 60% at 85% 75%, rgba(10,30,74,0.55) 0%,transparent 65%),
-        radial-gradient(ellipse 70% 40% at 50% 100%, rgba(4,14,36,0.65) 0%,transparent 65%),
-        #040e24;
-    }
-    canvas#stars   { position:fixed; inset:0; z-index:1; pointer-events:none; }
-    canvas#glitter { position:fixed; inset:0; z-index:1; pointer-events:none; }
+    /* NAV */
+    nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;justify-content:center;align-items:center;gap:2px;padding:13px 20px;background:rgba(4,14,36,.82);backdrop-filter:blur(22px);border-bottom:1px solid rgba(55,138,221,.12);}
+    .nav-logo{font-family:'Playfair Display',serif;font-size:1rem;font-style:italic;color:var(--b5);margin-right:18px;opacity:.9;cursor:pointer;user-select:none;}
+    nav a{text-decoration:none;font-size:.72rem;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);padding:7px 14px;border-radius:50px;transition:all .25s;white-space:nowrap;}
+    nav a:hover{color:var(--b5);background:rgba(55,138,221,.1);}
+    nav a.active{color:var(--b5);background:rgba(55,138,221,.12);}
+    .nav-right{margin-left:auto;display:flex;align-items:center;gap:10px;}
+    .nav-streak{display:flex;align-items:center;gap:6px;background:rgba(55,138,221,.12);border:1px solid rgba(55,138,221,.25);border-radius:50px;padding:5px 14px;font-size:.75rem;font-weight:600;color:var(--b5);}
+    .nav-wallet{display:flex;align-items:center;gap:6px;background:rgba(55,138,221,.15);border:1px solid rgba(55,138,221,.35);border-radius:50px;padding:5px 14px;cursor:pointer;font-size:.75rem;font-weight:700;color:#fff;transition:all .25s;animation:walletPulse 2.5s ease infinite;}
+    @keyframes walletPulse{0%,100%{box-shadow:0 0 16px rgba(55,138,221,.2)}50%{box-shadow:0 0 32px rgba(55,138,221,.45)}}
 
-    /* ── NAV ── */
-    nav {
-      position:fixed; top:0; left:0; right:0; z-index:100;
-      display:flex; justify-content:center; align-items:center;
-      gap:2px; padding:13px 20px;
-      background:rgba(4,14,36,0.82); backdrop-filter:blur(22px);
-      border-bottom:1px solid rgba(55,138,221,0.12);
-    }
-    .nav-logo { font-family:'Playfair Display',serif; font-size:1rem; font-style:italic; color:var(--b5); margin-right:18px; opacity:0.9; cursor:pointer; user-select:none; }
-    nav a { text-decoration:none; font-size:0.72rem; font-weight:500; letter-spacing:0.12em; text-transform:uppercase; color:var(--muted); padding:7px 14px; border-radius:50px; transition:all 0.25s; white-space:nowrap; }
-    nav a:hover  { color:var(--b5); background:rgba(55,138,221,0.1); }
-    nav a.active { color:var(--b5); background:rgba(55,138,221,0.12); }
-    .nav-right { margin-left:auto; display:flex; align-items:center; gap:10px; }
-    .nav-streak {
-      display:flex; align-items:center; gap:6px;
-      background:rgba(55,138,221,0.12); border:1px solid rgba(55,138,221,0.25);
-      border-radius:50px; padding:5px 14px;
-      font-size:0.75rem; font-weight:600; color:var(--b5);
-    }
-    /* LOVE WALLET */
-    .nav-wallet {
-      display:flex; align-items:center; gap:6px;
-      background:rgba(55,138,221,0.15); border:1px solid rgba(55,138,221,0.35);
-      border-radius:50px; padding:5px 14px; cursor:pointer;
-      font-size:0.75rem; font-weight:700; color:#fff;
-      transition:all 0.25s; box-shadow:0 0 18px rgba(55,138,221,0.2);
-      animation:walletGlow 2.5s ease infinite;
-    }
-    @keyframes walletGlow { 0%,100%{box-shadow:0 0 18px rgba(55,138,221,0.2)} 50%{box-shadow:0 0 32px rgba(55,138,221,0.4)} }
-    .nav-wallet:hover { background:rgba(55,138,221,0.25); }
+    main{position:relative;z-index:10;}
+    .sh{text-align:center;padding:20px 0 10px;}
+    .sh span{font-size:.65rem;font-weight:500;letter-spacing:.3em;text-transform:uppercase;color:var(--b5);opacity:.6;}
 
-    main { position:relative; z-index:10; }
+    /* LOCKED */
+    #state-locked{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:110px 24px 80px;}
+    .lock-wrap{width:90px;height:90px;margin:0 auto 32px;background:radial-gradient(circle,rgba(55,138,221,.15),rgba(24,95,165,.25));border:1px solid rgba(55,138,221,.25);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:2.6rem;animation:lockGlow 2.8s ease infinite;}
+    @keyframes lockGlow{0%,100%{box-shadow:0 0 50px rgba(24,95,165,.25)}50%{box-shadow:0 0 80px rgba(55,138,221,.4)}}
+    .lock-title{font-family:'Playfair Display',serif;font-size:clamp(2.2rem,6vw,4rem);font-weight:700;color:#fff;line-height:1.1;margin-bottom:14px;animation:fadeUp .9s ease both;}
+    .lock-title em{font-style:italic;color:var(--b5);}
+    .lock-sub{font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-style:italic;color:var(--muted);max-width:380px;margin:0 auto;line-height:1.9;animation:fadeUp .9s .15s ease both;}
+    .lock-dots{display:flex;justify-content:center;gap:10px;margin-top:44px;animation:fadeUp .9s .25s ease both;}
+    .lock-dot{width:10px;height:10px;border-radius:50%;background:rgba(55,138,221,.15);border:1px solid rgba(55,138,221,.25);transition:all .4s;}
+    .lock-dot.lit{background:var(--b4);box-shadow:0 0 12px rgba(55,138,221,.6);border-color:var(--b4);}
 
-    /* ── SHARED SECTION HEADER ── */
-    .sh { text-align:center; padding:20px 0 10px; }
-    .sh span { font-size:0.65rem; font-weight:500; letter-spacing:0.3em; text-transform:uppercase; color:var(--b5); opacity:0.6; }
+    /* GAME SHELL */
+    #state-game{display:none;padding:100px 24px 80px;}
+    .game-hero{text-align:center;margin-bottom:36px;animation:fadeUp .7s ease both;}
+    .game-tag{display:inline-flex;align-items:center;gap:8px;background:rgba(55,138,221,.1);border:1px solid rgba(55,138,221,.25);border-radius:50px;padding:7px 22px;font-size:.68rem;font-weight:500;letter-spacing:.22em;text-transform:uppercase;color:var(--b5);margin-bottom:16px;}
+    .game-title{font-family:'Playfair Display',serif;font-size:clamp(1.8rem,4vw,2.8rem);font-weight:700;color:#fff;line-height:1.1;margin-bottom:8px;}
+    .game-title em{font-style:italic;color:var(--b5);}
+    .game-sub{font-family:'Cormorant Garamond',serif;font-size:1rem;font-style:italic;color:var(--muted);line-height:1.8;}
 
-    @keyframes fadeUp { from{opacity:0;transform:translateY(22px)} to{opacity:1;transform:translateY(0)} }
-    @keyframes riseIn { from{opacity:0;transform:translateY(30px) scale(0.97)} to{opacity:1;transform:translateY(0) scale(1)} }
+    /* KEY PROGRESS */
+    .key-prog{max-width:480px;margin:0 auto 38px;display:flex;align-items:center;justify-content:center;}
+    .key-step{display:flex;flex-direction:column;align-items:center;gap:7px;flex:1;}
+    .key-circle{width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,.04);border:1px solid rgba(55,138,221,.2);display:flex;align-items:center;justify-content:center;font-size:1.35rem;transition:all .5s;}
+    .key-circle.active{border-color:rgba(55,138,221,.6);box-shadow:0 0 22px rgba(55,138,221,.3);background:rgba(55,138,221,.12);animation:kPulse 1.5s ease infinite;}
+    .key-circle.done{border-color:rgba(55,138,221,.5);background:rgba(55,138,221,.2);box-shadow:0 0 16px rgba(55,138,221,.2);}
+    @keyframes kPulse{0%,100%{box-shadow:0 0 22px rgba(55,138,221,.3)}50%{box-shadow:0 0 40px rgba(55,138,221,.55)}}
+    .key-lbl{font-size:.58rem;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);}
+    .key-lbl.active{color:var(--b5);}
+    .key-conn{flex:1;height:1px;background:rgba(55,138,221,.15);margin-bottom:22px;transition:background .5s;}
+    .key-conn.done{background:rgba(55,138,221,.45);}
 
-    /* ══════════════════════════════════════
-       LOCKED STATE
-    ══════════════════════════════════════ */
-    #state-locked {
-      min-height:100vh; display:flex; flex-direction:column;
-      align-items:center; justify-content:center; text-align:center;
-      padding:110px 24px 80px;
-    }
-    .lock-icon-wrap {
-      width:90px; height:90px; margin:0 auto 32px;
-      background:radial-gradient(circle, rgba(55,138,221,0.15), rgba(24,95,165,0.25));
-      border:1px solid rgba(55,138,221,0.25); border-radius:50%;
-      display:flex; align-items:center; justify-content:center; font-size:2.6rem;
-      box-shadow:0 0 50px rgba(24,95,165,0.25);
-      animation:lockGlow 2.8s ease infinite;
-    }
-    @keyframes lockGlow { 0%,100%{box-shadow:0 0 50px rgba(24,95,165,0.25)} 50%{box-shadow:0 0 80px rgba(55,138,221,0.4)} }
-    .lock-title {
-      font-family:'Playfair Display',serif; font-size:clamp(2.2rem,6vw,4rem);
-      font-weight:700; color:#fff; line-height:1.1; margin-bottom:14px;
-      text-shadow:0 0 60px rgba(55,138,221,0.25);
-      animation:fadeUp 0.9s ease both;
-    }
-    .lock-title em { font-style:italic; color:var(--b5); }
-    .lock-sub {
-      font-family:'Cormorant Garamond',serif; font-size:1.1rem; font-style:italic;
-      color:var(--muted); max-width:380px; margin:0 auto; line-height:1.9;
-      animation:fadeUp 0.9s 0.15s ease both;
-    }
-    .lock-dots { display:flex; justify-content:center; gap:10px; margin-top:44px; animation:fadeUp 0.9s 0.25s ease both; }
-    .lock-dot { width:10px; height:10px; border-radius:50%; background:rgba(55,138,221,0.15); border:1px solid rgba(55,138,221,0.25); transition:all 0.4s; }
-    .lock-dot.lit { background:var(--b4); box-shadow:0 0 12px rgba(55,138,221,0.6); border-color:var(--b4); }
+    /* MINI PIPS */
+    .mini-pips{max-width:480px;margin:0 auto 20px;display:flex;align-items:center;gap:7px;}
+    .mpip{flex:1;height:3px;border-radius:2px;background:rgba(55,138,221,.14);transition:background .4s;}
+    .mpip.done{background:var(--b4);}
+    .mpip.cur{background:var(--b5);animation:mpAnim .9s ease infinite alternate;}
+    @keyframes mpAnim{from{opacity:.5}to{opacity:1}}
 
-    /* ══════════════════════════════════════
-       GAME STATE
-    ══════════════════════════════════════ */
-    #state-game { display:none; padding:100px 24px 80px; }
+    /* GAME CARD */
+    .gcard-wrap{max-width:560px;margin:0 auto 30px;padding:0 8px;}
+    .gcard{background:var(--card-bg);backdrop-filter:blur(24px);border:1px solid var(--card-border);border-radius:28px;padding:34px 30px;text-align:center;position:relative;overflow:hidden;box-shadow:0 0 55px rgba(24,95,165,.14);animation:riseIn .5s cubic-bezier(.22,1,.36,1) both;}
+    .gcard::before{content:'';position:absolute;inset:0;border-radius:28px;background:radial-gradient(circle at 30% 20%,rgba(55,138,221,.06),transparent 60%);}
+    .gc-badge{display:inline-flex;align-items:center;gap:7px;background:rgba(55,138,221,.1);border:1px solid rgba(55,138,221,.25);border-radius:50px;padding:5px 16px;margin-bottom:16px;font-size:.64rem;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--b5);}
+    .gc-title{font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:700;color:#fff;margin-bottom:7px;}
+    .gc-desc{font-family:'Cormorant Garamond',serif;font-size:.96rem;font-style:italic;color:var(--muted);line-height:1.75;margin-bottom:18px;}
+    .gc-reward{display:none;align-items:center;justify-content:center;gap:8px;background:rgba(55,138,221,.12);border:1px solid rgba(55,138,221,.3);border-radius:50px;padding:8px 20px;margin-bottom:16px;font-size:.82rem;font-weight:600;color:var(--b5);animation:popIn .4s cubic-bezier(.22,1,.36,1) both;}
+    .gc-reward.show{display:flex;}
 
-    /* game hero */
-    .game-hero { text-align:center; margin-bottom:50px; animation:fadeUp 0.7s ease both; }
-    .game-tag {
-      display:inline-flex; align-items:center; gap:8px;
-      background:rgba(55,138,221,0.1); border:1px solid rgba(55,138,221,0.25);
-      border-radius:50px; padding:7px 22px;
-      font-size:0.68rem; font-weight:500; letter-spacing:0.22em; text-transform:uppercase;
-      color:var(--b5); margin-bottom:22px;
-    }
-    .game-title { font-family:'Playfair Display',serif; font-size:clamp(2rem,5vw,3.2rem); font-weight:700; color:#fff; line-height:1.1; margin-bottom:12px; }
-    .game-title em { font-style:italic; color:var(--b5); }
-    .game-sub { font-family:'Cormorant Garamond',serif; font-size:1.05rem; font-style:italic; color:var(--muted); line-height:1.8; }
+    /* TIMER */
+    .t-bar-wrap{margin:0 0 16px;height:4px;background:rgba(55,138,221,.12);border-radius:2px;overflow:hidden;}
+    .t-bar{height:100%;background:linear-gradient(90deg,var(--b3),var(--b4));border-radius:2px;transition:width .1s linear,background .4s;}
+    .t-lbl{font-size:.7rem;color:var(--muted);text-align:right;margin-bottom:6px;}
 
-    /* KEY PROGRESS BAR */
-    .key-progress { max-width:480px; margin:0 auto 56px; display:flex; align-items:center; justify-content:center; gap:0; }
-    .key-step {
-      display:flex; flex-direction:column; align-items:center; gap:8px; flex:1;
-    }
-    .key-circle {
-      width:52px; height:52px; border-radius:50%;
-      background:rgba(255,255,255,0.04); border:1px solid rgba(55,138,221,0.2);
-      display:flex; align-items:center; justify-content:center; font-size:1.4rem;
-      transition:all 0.5s; position:relative;
-    }
-    .key-circle.active { border-color:rgba(55,138,221,0.6); box-shadow:0 0 24px rgba(55,138,221,0.3); background:rgba(55,138,221,0.12); animation:keyPulse 1.5s ease infinite; }
-    .key-circle.done   { border-color:rgba(55,138,221,0.5); background:rgba(55,138,221,0.18); box-shadow:0 0 18px rgba(55,138,221,0.2); }
-    @keyframes keyPulse { 0%,100%{box-shadow:0 0 24px rgba(55,138,221,0.3)} 50%{box-shadow:0 0 40px rgba(55,138,221,0.55)} }
-    .key-label { font-size:0.58rem; font-weight:500; letter-spacing:0.12em; text-transform:uppercase; color:var(--muted); }
-    .key-label.active { color:var(--b5); }
-    .key-connector { flex:1; height:1px; background:rgba(55,138,221,0.15); margin-bottom:22px; transition:background 0.5s; }
-    .key-connector.done { background:rgba(55,138,221,0.4); }
+    /* OPTIONS */
+    .opts{display:flex;flex-direction:column;gap:9px;margin-bottom:18px;}
+    .opt{padding:12px 16px;border-radius:13px;background:rgba(255,255,255,.04);border:1px solid rgba(55,138,221,.18);font-size:.87rem;color:var(--text);cursor:pointer;text-align:left;transition:all .2s;}
+    .opt:hover{background:rgba(55,138,221,.12);border-color:rgba(55,138,221,.4);color:#fff;}
+    .opt.correct{background:rgba(55,138,221,.22);border-color:rgba(55,138,221,.65);color:#fff;box-shadow:0 0 20px rgba(55,138,221,.18);}
+    .opt.wrong{background:rgba(60,60,120,.08);border-color:rgba(55,80,180,.18);color:var(--muted);}
+    .opt:disabled{cursor:default;}
 
-    /* CARD wrapper */
-    .game-card-wrap { max-width:560px; margin:0 auto 40px; padding:0 24px; }
-    .game-card {
-      background:var(--card-bg); backdrop-filter:blur(24px);
-      border:1px solid var(--card-border); border-radius:28px; padding:44px 40px;
-      text-align:center; position:relative; overflow:hidden;
-      box-shadow:0 0 60px rgba(24,95,165,0.15);
-      animation:riseIn 0.5s cubic-bezier(.22,1,.36,1) both;
-    }
-    .game-card::before {
-      content:''; position:absolute; inset:0; border-radius:28px;
-      background:radial-gradient(circle at 30% 20%, rgba(55,138,221,0.07), transparent 60%);
-    }
-    .gc-key-badge {
-      display:inline-flex; align-items:center; gap:7px;
-      background:rgba(55,138,221,0.1); border:1px solid rgba(55,138,221,0.25);
-      border-radius:50px; padding:5px 16px; margin-bottom:22px;
-      font-size:0.65rem; font-weight:600; letter-spacing:0.15em; text-transform:uppercase; color:var(--b5);
-    }
-    .gc-title { font-family:'Playfair Display',serif; font-size:1.4rem; font-weight:700; color:#fff; margin-bottom:10px; }
-    .gc-desc  { font-family:'Cormorant Garamond',serif; font-size:1rem; font-style:italic; color:var(--muted); line-height:1.8; margin-bottom:28px; }
+    /* BUTTONS */
+    .gc-btn{padding:12px 30px;border:none;border-radius:50px;background:linear-gradient(135deg,var(--b3),var(--b4));color:#fff;font-family:'DM Sans',sans-serif;font-size:.82rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;box-shadow:0 6px 22px rgba(24,95,165,.38);transition:transform .2s,box-shadow .2s;margin-top:4px;}
+    .gc-btn:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(55,138,221,.44);}
+    .gc-btn:disabled{opacity:.5;cursor:default;transform:none;}
+    .ghost-btn{padding:8px 18px;border:1px solid rgba(55,138,221,.25);border-radius:50px;background:none;font-family:'DM Sans',sans-serif;font-size:.7rem;color:var(--muted);cursor:pointer;transition:all .2s;}
+    .ghost-btn:hover{color:var(--b5);border-color:rgba(55,138,221,.5);}
+    .result-line{font-family:'Playfair Display',serif;font-size:.92rem;font-style:italic;margin-top:14px;line-height:1.7;animation:fadeUp .35s ease both;}
 
-    /* puzzle image */
-    .puzzle-img-wrap {
-      margin:0 auto 22px; width:180px; height:180px; border-radius:18px; overflow:hidden;
-      position:relative; border:1px solid rgba(55,138,221,0.2);
-    }
-    .puzzle-img-wrap img { width:100%; height:100%; object-fit:cover; transition:filter 0.8s; }
-    .puzzle-img-wrap img.blurred { filter:blur(14px) brightness(0.7); }
-    .puzzle-img-wrap img.clear   { filter:none; }
-    .puzzle-reveal-hint { font-size:0.7rem; color:var(--muted); font-style:italic; margin-bottom:18px; }
+    /* ── GAME 1: BLUR REVEAL ── */
+    .blur-img{position:relative;width:220px;height:220px;margin:0 auto 12px;border-radius:18px;overflow:hidden;border:1px solid rgba(55,138,221,.2);cursor:pointer;user-select:none;}
+    .blur-img img{width:100%;height:100%;object-fit:cover;transition:filter .25s;}
+    .blur-hint-txt{position:absolute;bottom:0;left:0;right:0;padding:7px;background:rgba(4,14,36,.55);font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.5);pointer-events:none;}
+    .photo-ctr{font-size:.68rem;color:var(--muted);margin-bottom:8px;}
+    .hint-cost-note{font-size:.62rem;color:rgba(181,212,244,.4);display:block;margin-top:3px;}
 
-    /* question text */
-    .gc-question {
-      font-family:'Playfair Display',serif; font-size:1.05rem; font-style:italic; color:rgba(220,238,255,0.9);
-      line-height:1.8; margin-bottom:26px; min-height:50px;
-    }
+    /* ── GAME 2: EMOJI DECODER ── */
+    .emoji-seq{font-size:2.1rem;letter-spacing:.12em;margin:10px 0 18px;line-height:1.4;}
+    .caption-reveal{font-family:'Playfair Display',serif;font-size:.93rem;font-style:italic;color:var(--b6);margin-top:12px;line-height:1.7;animation:fadeUp .4s ease both;}
 
-    /* answer options */
-    .gc-options { display:flex; flex-direction:column; gap:10px; margin-bottom:24px; }
-    .gc-option {
-      padding:13px 18px; border-radius:14px;
-      background:rgba(255,255,255,0.04); border:1px solid rgba(55,138,221,0.18);
-      font-family:'DM Sans',sans-serif; font-size:0.88rem; color:var(--text);
-      cursor:pointer; text-align:left; transition:all 0.22s;
-    }
-    .gc-option:hover { background:rgba(55,138,221,0.12); border-color:rgba(55,138,221,0.4); color:#fff; }
-    .gc-option.correct { background:rgba(55,138,221,0.2); border-color:rgba(55,138,221,0.6); color:#fff; box-shadow:0 0 20px rgba(55,138,221,0.2); }
-    .gc-option.wrong   { background:rgba(55,100,200,0.08); border-color:rgba(55,100,200,0.2); color:var(--muted); }
+    /* ── GAME 3: PUZZLE ── */
+    .puzzle-grid{display:grid;gap:4px;margin:0 auto 14px;border-radius:14px;overflow:hidden;border:1px solid rgba(55,138,221,.2);}
+    .ptile{aspect-ratio:1;background-size:cover;background-position:center;cursor:pointer;transition:transform .15s,box-shadow .15s;border-radius:4px;position:relative;}
+    .ptile.sel{box-shadow:0 0 0 3px var(--b4) inset;transform:scale(.95);}
+    .ptile.snap{animation:snapAnim .25s ease;}
+    .ptile.empty{background:#0a1e4a!important;cursor:default;}
+    @keyframes snapAnim{0%{transform:scale(.87)}60%{transform:scale(1.05)}100%{transform:scale(1)}}
+    .puzzle-done{font-family:'Playfair Display',serif;font-size:.98rem;font-style:italic;color:var(--b5);margin-top:10px;animation:fadeUp .4s ease both;}
 
-    /* dare card */
-    .gc-dare {
-      font-family:'Playfair Display',serif; font-size:1.15rem; font-style:italic;
-      color:#fff; line-height:1.85; margin-bottom:28px; padding:18px 20px;
-      background:rgba(55,138,221,0.07); border-radius:16px; border:1px solid rgba(55,138,221,0.15);
-    }
+    /* ── GAME 4: CHAT MATCH ── */
+    .chat-box{max-height:240px;overflow-y:auto;margin-bottom:16px;padding:2px 0;}
+    .cmsg{display:flex;margin-bottom:9px;animation:fadeUp .3s ease both;}
+    .cmsg.me{justify-content:flex-end;}
+    .cmsg.you{justify-content:flex-start;}
+    .cbubble{max-width:72%;padding:9px 14px;border-radius:18px;font-size:.84rem;line-height:1.5;}
+    .cmsg.me  .cbubble{background:rgba(24,95,165,.38);border-radius:18px 4px 18px 18px;color:#fff;}
+    .cmsg.you .cbubble{background:rgba(55,138,221,.14);border-radius:4px 18px 18px 18px;color:var(--b6);}
+    .chat-react{font-family:'Playfair Display',serif;font-size:.9rem;font-style:italic;color:var(--b5);margin-top:10px;line-height:1.7;animation:fadeUp .4s ease both;}
 
-    /* text input */
-    .gc-input {
-      width:100%; padding:13px 16px; border-radius:14px;
-      background:rgba(255,255,255,0.05); border:1px solid rgba(55,138,221,0.25);
-      font-family:'DM Sans',sans-serif; font-size:0.9rem; color:#fff; outline:none;
-      margin-bottom:18px; transition:border-color 0.3s;
-    }
-    .gc-input:focus { border-color:rgba(55,138,221,0.55); }
+    /* ── GAME 5: SOUND MEMORY ── */
+    .sound-play-btn{width:78px;height:78px;border-radius:50%;border:1px solid rgba(55,138,221,.35);background:rgba(55,138,221,.12);display:flex;align-items:center;justify-content:center;font-size:1.9rem;cursor:pointer;margin:0 auto 10px;transition:all .25s;animation:walletPulse 2.2s ease infinite;}
+    .sound-play-btn:hover{background:rgba(55,138,221,.25);box-shadow:0 0 40px rgba(55,138,221,.35);}
+    .sound-play-btn.disabled{opacity:.35;pointer-events:none;}
+    .replay-info{font-size:.7rem;color:var(--muted);margin-bottom:14px;font-style:italic;}
+    /* playing animation */
+    .sound-wave{display:flex;align-items:center;justify-content:center;gap:4px;height:24px;margin-bottom:10px;}
+    .sw{width:4px;border-radius:2px;background:var(--b4);animation:swAnim 0.7s ease infinite;}
+    .sw:nth-child(1){animation-delay:0s;height:8px;}
+    .sw:nth-child(2){animation-delay:.15s;height:18px;}
+    .sw:nth-child(3){animation-delay:.3s;height:12px;}
+    .sw:nth-child(4){animation-delay:.1s;height:20px;}
+    .sw:nth-child(5){animation-delay:.25s;height:10px;}
+    @keyframes swAnim{0%,100%{transform:scaleY(.5)}50%{transform:scaleY(1.4)}}
+    .sound-wave{display:none;}
+    .sound-wave.playing{display:flex;}
 
-    /* primary button */
-    .gc-btn {
-      padding:14px 36px; border:none; border-radius:50px;
-      background:linear-gradient(135deg,var(--b3),var(--b4)); color:#fff;
-      font-family:'DM Sans',sans-serif; font-size:0.82rem; font-weight:600;
-      letter-spacing:0.14em; text-transform:uppercase; cursor:pointer;
-      box-shadow:0 6px 28px rgba(24,95,165,0.38); transition:transform 0.2s,box-shadow 0.2s;
-    }
-    .gc-btn:hover { transform:translateY(-2px); box-shadow:0 10px 36px rgba(55,138,221,0.45); }
-    .gc-btn:active{ transform:translateY(0); }
+    /* ── HEART: LOVE METER ── */
+    .love-q{font-family:'Playfair Display',serif;font-size:1.05rem;font-style:italic;color:rgba(220,238,255,.92);line-height:1.8;margin-bottom:22px;min-height:48px;}
+    .meter-wrap{margin:14px auto 18px;max-width:320px;}
+    .meter-bg{height:18px;background:rgba(55,138,221,.1);border-radius:9px;overflow:hidden;border:1px solid rgba(55,138,221,.2);}
+    .meter-fill{height:100%;background:linear-gradient(90deg,var(--b3),var(--b4),#a78bfa);border-radius:9px;width:0%;transition:width 1.3s cubic-bezier(.22,1,.36,1);}
+    .meter-lbl{font-size:.78rem;color:var(--b5);margin-top:8px;font-weight:600;}
+    .meter-react{font-family:'Playfair Display',serif;font-size:.93rem;font-style:italic;color:var(--b6);margin-top:8px;line-height:1.7;animation:fadeUp .4s ease both;}
 
-    /* reward flash */
-    .gc-reward-flash {
-      display:none; align-items:center; justify-content:center; gap:10px;
-      background:rgba(55,138,221,0.12); border:1px solid rgba(55,138,221,0.3);
-      border-radius:50px; padding:10px 24px; margin-bottom:18px;
-      font-size:0.88rem; font-weight:600; color:var(--b5);
-      animation:rewardPop 0.45s cubic-bezier(.22,1,.36,1) both;
-    }
-    @keyframes rewardPop { from{transform:scale(0.7);opacity:0} to{transform:scale(1);opacity:1} }
-    .gc-reward-flash.show { display:flex; }
+    /* ── HEART: THIS OR THAT ── */
+    .tot-wrap{display:flex;gap:12px;margin:16px 0;}
+    .tot-btn{flex:1;padding:16px 10px;border-radius:16px;background:rgba(255,255,255,.04);border:1px solid rgba(55,138,221,.18);font-family:'DM Sans',sans-serif;font-size:.9rem;color:var(--text);cursor:pointer;transition:all .24s;line-height:1.5;}
+    .tot-btn:hover{background:rgba(55,138,221,.14);border-color:rgba(55,138,221,.5);color:#fff;transform:scale(1.03);}
+    .tot-btn.yours{background:rgba(55,138,221,.22);border-color:rgba(55,138,221,.65);color:#fff;box-shadow:0 0 20px rgba(55,138,221,.18);}
+    .tot-ctr{font-size:.68rem;color:var(--muted);margin-bottom:4px;}
+    .tot-react{font-family:'Playfair Display',serif;font-size:.9rem;font-style:italic;color:var(--b5);margin-top:12px;line-height:1.7;animation:fadeUp .35s ease both;}
 
-    /* ══════════════════════════════════════
-       PRIZE ROOM
-    ══════════════════════════════════════ */
-    #state-prize { display:none; padding:100px 24px 80px; }
-    .prize-hero { text-align:center; margin-bottom:48px; animation:fadeUp 0.7s ease both; }
-    .prize-hero-icon { font-size:3.5rem; margin-bottom:16px; display:block; animation:prizeFloat 2s ease infinite; }
-    @keyframes prizeFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
-    .prize-hero-title { font-family:'Playfair Display',serif; font-size:clamp(2rem,5vw,3rem); font-weight:700; color:#fff; margin-bottom:10px; }
-    .prize-hero-title em { font-style:italic; color:var(--b5); }
-    .prize-hero-sub { font-family:'Cormorant Garamond',serif; font-size:1.05rem; font-style:italic; color:var(--muted); line-height:1.8; }
-    .prize-wallet-big {
-      display:inline-flex; align-items:center; gap:8px; margin-top:18px;
-      background:rgba(55,138,221,0.15); border:1px solid rgba(55,138,221,0.35);
-      border-radius:50px; padding:8px 22px;
-      font-size:1rem; font-weight:700; color:#fff;
-    }
+    /* ── TRUST: DARE ── */
+    .dare-box{font-family:'Playfair Display',serif;font-size:1rem;font-style:italic;color:#fff;line-height:1.95;margin-bottom:20px;padding:18px 20px;background:rgba(55,138,221,.07);border-radius:16px;border:1px solid rgba(55,138,221,.15);}
 
-    .prize-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:14px; max-width:680px; margin:0 auto 40px; }
-    .prize-item {
-      background:var(--card-bg); border:1px solid var(--card-border); border-radius:20px;
-      padding:24px 18px; text-align:center; cursor:pointer; position:relative;
-      transition:all 0.3s; overflow:hidden;
-    }
-    .prize-item:hover { transform:translateY(-4px); border-color:rgba(55,138,221,0.4); box-shadow:0 14px 44px rgba(0,0,0,0.4),0 0 30px rgba(55,138,221,0.12); }
-    .prize-item.disabled { opacity:0.35; pointer-events:none; }
-    .prize-emoji { font-size:2rem; margin-bottom:10px; display:block; }
-    .prize-name  { font-family:'Playfair Display',serif; font-size:1rem; font-weight:700; color:#fff; margin-bottom:6px; }
-    .prize-cost  {
-      display:inline-flex; align-items:center; gap:5px;
-      background:rgba(55,138,221,0.1); border:1px solid rgba(55,138,221,0.22);
-      border-radius:50px; padding:3px 12px; font-size:0.72rem; font-weight:600; color:var(--b5);
-    }
-    .prize-limited {
-      position:absolute; top:10px; right:10px;
-      background:rgba(55,138,221,0.18); border:1px solid rgba(55,138,221,0.3);
-      border-radius:50px; padding:2px 9px; font-size:0.58rem; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; color:var(--b5);
-    }
-    .prize-claimed {
-      position:absolute; inset:0; border-radius:20px;
-      background:rgba(4,14,36,0.75); display:flex; align-items:center; justify-content:center;
-      font-size:0.8rem; font-weight:600; color:var(--b5); opacity:0; transition:opacity 0.3s;
-    }
-    .prize-item.claimed .prize-claimed { opacity:1; }
-    .prize-item.claimed { pointer-events:none; }
+    /* PRIZE ROOM */
+    #state-prize{display:none;padding:100px 24px 80px;}
+    .prize-hero{text-align:center;margin-bottom:40px;animation:fadeUp .7s ease both;}
+    .prize-icon{font-size:3.4rem;display:block;margin-bottom:13px;animation:prFloat 2s ease infinite;}
+    @keyframes prFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+    .prize-h1{font-family:'Playfair Display',serif;font-size:clamp(1.8rem,4vw,2.8rem);font-weight:700;color:#fff;margin-bottom:10px;}
+    .prize-h1 em{font-style:italic;color:var(--b5);}
+    .prize-sub{font-family:'Cormorant Garamond',serif;font-size:1rem;font-style:italic;color:var(--muted);line-height:1.8;}
+    .wallet-big{display:inline-flex;align-items:center;gap:8px;margin-top:14px;background:rgba(55,138,221,.15);border:1px solid rgba(55,138,221,.35);border-radius:50px;padding:8px 22px;font-size:1rem;font-weight:700;color:#fff;}
+    .prize-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(185px,1fr));gap:13px;max-width:700px;margin:0 auto 36px;}
+    .prize-item{background:var(--card-bg);border:1px solid var(--card-border);border-radius:20px;padding:22px 14px;text-align:center;cursor:pointer;position:relative;transition:all .28s;overflow:hidden;}
+    .prize-item:hover{transform:translateY(-4px);border-color:rgba(55,138,221,.4);box-shadow:0 14px 44px rgba(0,0,0,.4),0 0 28px rgba(55,138,221,.12);}
+    .prize-item.disabled{opacity:.3;pointer-events:none;}
+    .p-emoji{font-size:1.9rem;margin-bottom:9px;display:block;}
+    .p-name{font-family:'Playfair Display',serif;font-size:.96rem;font-weight:700;color:#fff;margin-bottom:5px;}
+    .p-cost{display:inline-flex;align-items:center;gap:4px;background:rgba(55,138,221,.1);border:1px solid rgba(55,138,221,.22);border-radius:50px;padding:3px 11px;font-size:.7rem;font-weight:600;color:var(--b5);}
+    .p-claimed{position:absolute;inset:0;border-radius:20px;background:rgba(4,14,36,.78);display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:600;color:var(--b5);opacity:0;transition:opacity .3s;}
+    .prize-item.claimed .p-claimed{opacity:1;}
+    .prize-item.claimed{pointer-events:none;}
 
-    /* ══════════════════════════════════════
-       HUG CORNER
-    ══════════════════════════════════════ */
-    .hug-corner {
-      position:fixed; bottom:22px; right:22px; z-index:200;
-      display:flex; flex-direction:column; align-items:center; gap:6px;
-    }
-    .hug-btn {
-      width:62px; height:62px; border-radius:50%; border:1px solid rgba(55,138,221,0.3);
-      background:rgba(55,138,221,0.1); display:flex; align-items:center; justify-content:center;
-      font-size:1.8rem; cursor:pointer; user-select:none;
-      box-shadow:0 0 30px rgba(55,138,221,0.15);
-      animation:hugPulse 2.4s ease infinite; transition:all 0.25s;
-    }
-    .hug-btn:hover { background:rgba(55,138,221,0.2); box-shadow:0 0 50px rgba(55,138,221,0.3); }
-    @keyframes hugPulse { 0%,100%{box-shadow:0 0 30px rgba(55,138,221,0.15)} 50%{box-shadow:0 0 50px rgba(55,138,221,0.3)} }
-    .hug-label { font-size:0.58rem; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted); text-align:center; max-width:80px; line-height:1.4; }
+    /* HUG */
+    .hug-corner{position:fixed;bottom:22px;right:22px;z-index:200;display:flex;flex-direction:column;align-items:center;gap:6px;}
+    .hug-btn{width:62px;height:62px;border-radius:50%;border:1px solid rgba(55,138,221,.3);background:rgba(55,138,221,.1);display:flex;align-items:center;justify-content:center;font-size:1.8rem;cursor:pointer;user-select:none;animation:walletPulse 2.4s ease infinite;transition:all .25s;}
+    .hug-lbl{font-size:.54rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);text-align:center;max-width:80px;line-height:1.4;}
+    #hug-overlay{display:none;position:fixed;inset:0;z-index:500;background:rgba(4,14,36,.9);backdrop-filter:blur(20px);align-items:center;justify-content:center;padding:24px;}
+    #hug-overlay.show{display:flex;}
+    .hug-modal{background:rgba(255,255,255,.05);border:1px solid rgba(55,138,221,.3);border-radius:30px;padding:46px 36px;max-width:390px;width:100%;text-align:center;animation:riseIn .4s cubic-bezier(.22,1,.36,1) both;}
+    .hug-emoji{font-size:3.2rem;display:block;margin-bottom:14px;animation:walletPulse 1.5s ease infinite;}
+    .hug-ring-wrap{width:80px;height:80px;margin:0 auto 14px;}
+    .hug-ring-wrap svg{transform:rotate(-90deg);}
+    .hug-ring-bg{fill:none;stroke:rgba(55,138,221,.15);stroke-width:4;}
+    .hug-ring-fill{fill:none;stroke:var(--b4);stroke-width:4;stroke-linecap:round;stroke-dasharray:220;stroke-dashoffset:220;transition:stroke-dashoffset .1s linear;}
+    .hug-title{font-family:'Playfair Display',serif;font-size:1.2rem;font-style:italic;color:#fff;margin-bottom:7px;}
+    .hug-sub{font-family:'Cormorant Garamond',serif;font-size:.9rem;font-style:italic;color:var(--muted);line-height:1.7;}
+    .hug-msg{font-family:'Playfair Display',serif;font-size:.98rem;font-style:italic;color:var(--b6);line-height:1.85;display:none;}
+    .hug-close{margin-top:20px;background:none;border:1px solid rgba(55,138,221,.2);border-radius:50px;padding:8px 20px;font-family:'DM Sans',sans-serif;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);cursor:pointer;transition:all .2s;}
+    .hug-close:hover{color:var(--b5);}
 
-    /* hug hold overlay */
-    #hug-overlay {
-      display:none; position:fixed; inset:0; z-index:500;
-      background:rgba(4,14,36,0.9); backdrop-filter:blur(20px);
-      align-items:center; justify-content:center; padding:24px;
-    }
-    #hug-overlay.show { display:flex; }
-    .hug-modal {
-      background:rgba(255,255,255,0.05); border:1px solid rgba(55,138,221,0.3);
-      border-radius:30px; padding:50px 40px; max-width:420px; width:100%;
-      text-align:center; animation:riseIn 0.4s cubic-bezier(.22,1,.36,1) both;
-      box-shadow:0 0 80px rgba(24,95,165,0.3);
-    }
-    .hug-modal-emoji { font-size:3.5rem; display:block; margin-bottom:18px; animation:hugFloat 1.5s ease infinite; }
-    @keyframes hugFloat { 0%,100%{transform:scale(1)} 50%{transform:scale(1.12)} }
-    .hug-progress-ring { width:80px; height:80px; margin:0 auto 18px; position:relative; }
-    .hug-progress-ring svg { transform:rotate(-90deg); }
-    .hug-ring-bg  { fill:none; stroke:rgba(55,138,221,0.15); stroke-width:4; }
-    .hug-ring-fill{ fill:none; stroke:var(--b4); stroke-width:4; stroke-linecap:round; stroke-dasharray:220; stroke-dashoffset:220; transition:stroke-dashoffset 0.1s linear; }
-    .hug-modal-title { font-family:'Playfair Display',serif; font-size:1.3rem; font-style:italic; color:#fff; margin-bottom:8px; }
-    .hug-modal-sub { font-family:'Cormorant Garamond',serif; font-size:0.95rem; font-style:italic; color:var(--muted); line-height:1.75; }
-    .hug-msg { font-family:'Playfair Display',serif; font-size:1.1rem; font-style:italic; color:var(--b6); line-height:1.85; display:none; }
-    .hug-close { margin-top:24px; background:none; border:1px solid rgba(55,138,221,0.2); border-radius:50px; padding:9px 22px; font-family:'DM Sans',sans-serif; font-size:0.72rem; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted); cursor:pointer; transition:all 0.2s; }
-    .hug-close:hover { color:var(--b5); border-color:rgba(55,138,221,0.4); }
+    /* WALLET MODAL */
+    #wallet-modal{display:none;position:fixed;inset:0;z-index:400;background:rgba(4,14,36,.9);backdrop-filter:blur(18px);align-items:center;justify-content:center;padding:24px;}
+    #wallet-modal.show{display:flex;}
+    .w-card{background:rgba(255,255,255,.05);border:1px solid rgba(55,138,221,.28);border-radius:28px;padding:38px 32px;max-width:350px;width:100%;text-align:center;animation:riseIn .4s cubic-bezier(.22,1,.36,1) both;}
+    .w-title{font-family:'Playfair Display',serif;font-size:1.35rem;color:#fff;margin-bottom:4px;}
+    .w-amt{font-family:'Playfair Display',serif;font-size:3rem;font-weight:700;color:var(--b5);line-height:1;margin:14px 0 4px;}
+    .w-sub{font-family:'Cormorant Garamond',serif;font-size:.86rem;font-style:italic;color:var(--muted);margin-bottom:18px;}
+    .w-hist{text-align:left;max-height:140px;overflow-y:auto;margin-bottom:18px;}
+    .w-row{font-size:.72rem;color:var(--muted);padding:5px 0;border-bottom:1px solid rgba(55,138,221,.08);display:flex;justify-content:space-between;}
+    .w-row .wa{color:var(--b5);font-weight:600;}
+    .w-close{background:none;border:1px solid rgba(55,138,221,.2);border-radius:50px;padding:8px 20px;font-family:'DM Sans',sans-serif;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);cursor:pointer;transition:all .2s;}
+    .w-close:hover{color:var(--b5);}
 
-    /* ══════════════════════════════════════
-       WALLET MODAL
-    ══════════════════════════════════════ */
-    #wallet-modal {
-      display:none; position:fixed; inset:0; z-index:400;
-      background:rgba(4,14,36,0.88); backdrop-filter:blur(18px);
-      align-items:center; justify-content:center; padding:24px;
-    }
-    #wallet-modal.show { display:flex; }
-    .wallet-card {
-      background:rgba(255,255,255,0.05); border:1px solid rgba(55,138,221,0.28);
-      border-radius:28px; padding:44px 38px; max-width:380px; width:100%;
-      text-align:center; animation:riseIn 0.4s cubic-bezier(.22,1,.36,1) both;
-    }
-    .wallet-title { font-family:'Playfair Display',serif; font-size:1.5rem; color:#fff; margin-bottom:6px; }
-    .wallet-amount { font-family:'Playfair Display',serif; font-size:3.5rem; font-weight:700; color:var(--b5); line-height:1; margin:18px 0 6px; }
-    .wallet-sub  { font-family:'Cormorant Garamond',serif; font-size:0.9rem; font-style:italic; color:var(--muted); margin-bottom:24px; }
-    .wallet-history { text-align:left; max-height:160px; overflow-y:auto; margin-bottom:22px; }
-    .wallet-entry { font-size:0.75rem; color:var(--muted); padding:5px 0; border-bottom:1px solid rgba(55,138,221,0.08); display:flex; justify-content:space-between; }
-    .wallet-entry .we-amt { color:var(--b5); font-weight:600; }
-    .wallet-close { background:none; border:1px solid rgba(55,138,221,0.2); border-radius:50px; padding:9px 22px; font-family:'DM Sans',sans-serif; font-size:0.72rem; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted); cursor:pointer; transition:all 0.2s; }
-    .wallet-close:hover { color:var(--b5); border-color:rgba(55,138,221,0.4); }
+    /* TICKET FLY */
+    .t-fly{position:fixed;pointer-events:none;z-index:600;font-size:1rem;font-weight:700;color:var(--b5);animation:tFly 1.1s cubic-bezier(.22,1,.36,1) forwards;}
+    @keyframes tFly{0%{opacity:1;transform:translateY(0) scale(1)}50%{opacity:1;transform:translateY(-48px) scale(1.3)}100%{opacity:0;transform:translateY(-88px) scale(.8)}}
 
-    /* ══════════════════════════════════════
-       ADMIN
-    ══════════════════════════════════════ */
-    #admin-gate {
-      display:none; position:fixed; inset:0; z-index:900;
-      background:rgba(4,14,36,0.97); backdrop-filter:blur(20px);
-      align-items:center; justify-content:center; padding:24px;
-    }
-    #admin-gate.show { display:flex; }
-    .admin-modal {
-      background:rgba(255,255,255,0.05); border:1px solid rgba(55,138,221,0.25);
-      border-radius:28px; padding:44px 40px; max-width:440px; width:100%; text-align:center;
-      box-shadow:0 0 60px rgba(24,95,165,0.2); animation:riseIn 0.4s cubic-bezier(.22,1,.36,1) both;
-    }
-    .admin-title { font-family:'Playfair Display',serif; font-size:1.4rem; color:#fff; margin-bottom:6px; }
-    .admin-sub   { font-family:'Cormorant Garamond',serif; font-size:0.9rem; font-style:italic; color:var(--muted); margin-bottom:26px; }
-    .a-input {
-      width:100%; padding:12px 16px; border:1px solid rgba(55,138,221,0.28); border-radius:13px;
-      background:rgba(255,255,255,0.05); font-family:'DM Sans',sans-serif;
-      font-size:1rem; letter-spacing:0.2em; color:#fff; text-align:center; outline:none;
-      margin-bottom:12px; transition:border-color 0.3s;
-    }
-    .a-input:focus { border-color:rgba(55,138,221,0.6); }
-    .a-btn {
-      width:100%; padding:13px; border:none; border-radius:13px;
-      background:linear-gradient(135deg,var(--b3),var(--b4)); color:#fff;
-      font-family:'DM Sans',sans-serif; font-size:0.8rem; font-weight:600;
-      letter-spacing:0.12em; text-transform:uppercase; cursor:pointer;
-      box-shadow:0 6px 24px rgba(24,95,165,0.35); transition:transform 0.2s;
-    }
-    .a-btn:hover { transform:translateY(-2px); }
-    .a-err { margin-top:10px; font-size:0.78rem; color:var(--b5); font-style:italic; min-height:18px; }
-    .a-cancel { margin-top:14px; background:none; border:none; font-family:'DM Sans',sans-serif; font-size:0.7rem; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted); cursor:pointer; transition:color 0.2s; }
-    .a-cancel:hover { color:var(--b5); }
+    /* ADMIN */
+    #admin-gate{display:none;position:fixed;inset:0;z-index:900;background:rgba(4,14,36,.97);backdrop-filter:blur(20px);align-items:center;justify-content:center;padding:24px;}
+    #admin-gate.show{display:flex;}
+    .adm-card{background:rgba(255,255,255,.05);border:1px solid rgba(55,138,221,.25);border-radius:28px;padding:42px 36px;max-width:420px;width:100%;text-align:center;animation:riseIn .4s cubic-bezier(.22,1,.36,1) both;}
+    .adm-title{font-family:'Playfair Display',serif;font-size:1.4rem;color:#fff;margin-bottom:5px;}
+    .adm-sub{font-family:'Cormorant Garamond',serif;font-size:.88rem;font-style:italic;color:var(--muted);margin-bottom:22px;}
+    .a-inp{width:100%;padding:11px 15px;border:1px solid rgba(55,138,221,.28);border-radius:13px;background:rgba(255,255,255,.05);font-family:'DM Sans',sans-serif;font-size:1rem;letter-spacing:.2em;color:#fff;text-align:center;outline:none;margin-bottom:11px;transition:border-color .3s;}
+    .a-inp:focus{border-color:rgba(55,138,221,.6);}
+    .a-go{width:100%;padding:13px;border:none;border-radius:13px;background:linear-gradient(135deg,var(--b3),var(--b4));color:#fff;font-family:'DM Sans',sans-serif;font-size:.8rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;transition:transform .2s;}
+    .a-go:hover{transform:translateY(-2px);}
+    .a-err{margin-top:9px;font-size:.76rem;color:var(--b5);font-style:italic;min-height:18px;}
+    .a-cancel{margin-top:12px;background:none;border:none;font-family:'DM Sans',sans-serif;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);cursor:pointer;}
+    .a-cancel:hover{color:var(--b5);}
+    #admin-panel{display:none;position:fixed;inset:0;z-index:901;background:rgba(4,14,36,.98);overflow-y:auto;}
+    #admin-panel.show{display:block;}
+    .ap-in{max-width:620px;margin:0 auto;padding:80px 24px 80px;}
+    .ap-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:30px;}
+    .ap-htitle{font-family:'Playfair Display',serif;font-size:1.35rem;color:#fff;}
+    .ap-x{background:rgba(255,255,255,.06);border:1px solid rgba(55,138,221,.2);border-radius:10px;padding:8px 16px;font-size:.7rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);cursor:pointer;transition:all .2s;}
+    .ap-x:hover{color:var(--b5);border-color:rgba(55,138,221,.4);}
+    .ap-sec{margin-bottom:28px;}
+    .ap-stitle{font-size:.62rem;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--b4);opacity:.8;margin-bottom:11px;display:flex;align-items:center;gap:9px;}
+    .ap-stitle::after{content:'';flex:1;height:1px;background:rgba(55,138,221,.15);}
+    .ap-row{display:flex;align-items:center;gap:14px;margin-bottom:9px;}
+    .ap-lbl{font-size:.82rem;color:var(--text);flex:1;}
+    .tog{position:relative;width:46px;height:26px;flex-shrink:0;}
+    .tog input{opacity:0;width:0;height:0;}
+    .tog-sl{position:absolute;inset:0;border-radius:50px;cursor:pointer;background:rgba(255,255,255,.1);border:1px solid rgba(55,138,221,.2);transition:all .3s;}
+    .tog-sl::before{content:'';position:absolute;width:18px;height:18px;border-radius:50%;background:#fff;left:3px;top:3px;transition:transform .3s;}
+    .tog input:checked+.tog-sl{background:var(--b3);border-color:var(--b4);}
+    .tog input:checked+.tog-sl::before{transform:translateX(20px);}
+    .ap-inp,.ap-ta{width:100%;padding:10px 13px;border:1px solid rgba(55,138,221,.22);border-radius:11px;background:rgba(255,255,255,.05);font-family:'DM Sans',sans-serif;font-size:.85rem;color:var(--text);outline:none;margin-bottom:8px;transition:border-color .3s;}
+    .ap-inp:focus,.ap-ta:focus{border-color:rgba(55,138,221,.55);}
+    .ap-ta{resize:vertical;min-height:70px;}
+    .ap-num{width:70px;padding:10px 8px;border:1px solid rgba(55,138,221,.22);border-radius:11px;background:rgba(255,255,255,.05);font-family:'DM Sans',sans-serif;font-size:.85rem;color:var(--text);outline:none;text-align:center;}
+    .ap-sv{padding:10px 22px;border:none;border-radius:12px;background:linear-gradient(135deg,var(--b3),var(--b4));color:#fff;font-family:'DM Sans',sans-serif;font-size:.78rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:transform .2s;}
+    .ap-sv:hover{transform:translateY(-2px);}
+    .ap-ok{font-size:.73rem;color:var(--b5);font-style:italic;min-height:15px;margin-top:5px;}
+    .ap-big{width:100%;padding:14px;border:none;border-radius:16px;background:linear-gradient(135deg,var(--b3),var(--b4));color:#fff;font-family:'DM Sans',sans-serif;font-size:.85rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;box-shadow:0 8px 26px rgba(24,95,165,.4);transition:transform .2s;margin-top:6px;}
+    .ap-big:hover{transform:translateY(-2px);}
+    .ap-danger{background:linear-gradient(135deg,#3a1a3a,#5a2a4a);}
+    .ap-g2{display:grid;grid-template-columns:1fr 70px;gap:8px;align-items:start;}
+    .ap-pr-row{display:flex;align-items:center;gap:7px;padding:8px 0;border-bottom:1px solid rgba(55,138,221,.08);}
+    .ap-pr-row .ap-inp{margin:0;}
+    .ap-bon-row{display:flex;gap:10px;align-items:center;}
+    .note{font-size:.7rem;color:var(--muted);font-style:italic;margin-bottom:10px;line-height:1.6;}
 
-    /* ADMIN PANEL */
-    #admin-panel {
-      display:none; position:fixed; inset:0; z-index:901;
-      background:rgba(4,14,36,0.98); overflow-y:auto;
-    }
-    #admin-panel.show { display:block; }
-    .ap-inner { max-width:600px; margin:0 auto; padding:80px 24px 80px; }
-    .ap-hdr { display:flex; justify-content:space-between; align-items:center; margin-bottom:36px; }
-    .ap-hdr-title { font-family:'Playfair Display',serif; font-size:1.4rem; color:#fff; }
-    .ap-close { background:rgba(255,255,255,0.06); border:1px solid rgba(55,138,221,0.2); border-radius:10px; padding:8px 16px; font-size:0.7rem; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted); cursor:pointer; transition:all 0.2s; }
-    .ap-close:hover { color:var(--b5); border-color:rgba(55,138,221,0.4); }
-    .ap-sec { margin-bottom:34px; }
-    .ap-sec-title { font-size:0.62rem; font-weight:600; letter-spacing:0.22em; text-transform:uppercase; color:var(--b4); opacity:0.8; margin-bottom:14px; display:flex; align-items:center; gap:10px; }
-    .ap-sec-title::after { content:''; flex:1; height:1px; background:rgba(55,138,221,0.15); }
-    .ap-row { display:flex; align-items:center; gap:14px; margin-bottom:12px; }
-    .ap-label { font-size:0.82rem; color:var(--text); flex:1; }
-    .toggle-wrap { position:relative; width:46px; height:26px; flex-shrink:0; }
-    .toggle-wrap input { opacity:0; width:0; height:0; }
-    .toggle-slider { position:absolute; inset:0; border-radius:50px; cursor:pointer; background:rgba(255,255,255,0.1); border:1px solid rgba(55,138,221,0.2); transition:all 0.3s; }
-    .toggle-slider::before { content:''; position:absolute; width:18px; height:18px; border-radius:50%; background:#fff; left:3px; top:3px; transition:transform 0.3s; }
-    .toggle-wrap input:checked + .toggle-slider { background:var(--b3); border-color:var(--b4); }
-    .toggle-wrap input:checked + .toggle-slider::before { transform:translateX(20px); }
-    .ap-input, .ap-textarea, .ap-num {
-      width:100%; padding:11px 14px; border:1px solid rgba(55,138,221,0.25); border-radius:12px;
-      background:rgba(255,255,255,0.05); font-family:'DM Sans',sans-serif;
-      font-size:0.88rem; color:var(--text); outline:none; margin-bottom:10px;
-      transition:border-color 0.3s;
-    }
-    .ap-input:focus, .ap-textarea:focus, .ap-num:focus { border-color:rgba(55,138,221,0.55); }
-    .ap-textarea { resize:vertical; min-height:80px; }
-    .ap-num  { width:80px; text-align:center; }
-    .ap-grid2 { display:grid; grid-template-columns:1fr 80px; gap:10px; align-items:start; }
-    .ap-row-item { display:flex; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid rgba(55,138,221,0.08); }
-    .ap-row-item .ap-input { margin-bottom:0; }
-    .ap-save {
-      padding:10px 24px; border:none; border-radius:12px;
-      background:linear-gradient(135deg,var(--b3),var(--b4)); color:#fff;
-      font-family:'DM Sans',sans-serif; font-size:0.78rem; font-weight:600;
-      letter-spacing:0.1em; text-transform:uppercase; cursor:pointer;
-      box-shadow:0 4px 18px rgba(24,95,165,0.3); transition:transform 0.2s; margin-top:4px;
-    }
-    .ap-save:hover { transform:translateY(-2px); }
-    .ap-ok { font-size:0.75rem; color:var(--b5); font-style:italic; min-height:16px; margin-top:7px; }
-    .ap-start-btn {
-      width:100%; padding:16px; border:none; border-radius:16px;
-      background:linear-gradient(135deg,var(--b3),var(--b4)); color:#fff;
-      font-family:'DM Sans',sans-serif; font-size:0.88rem; font-weight:600;
-      letter-spacing:0.14em; text-transform:uppercase; cursor:pointer;
-      box-shadow:0 8px 30px rgba(24,95,165,0.45); transition:transform 0.2s,box-shadow 0.2s;
-      margin-top:8px;
-    }
-    .ap-start-btn:hover { transform:translateY(-2px); box-shadow:0 12px 40px rgba(55,138,221,0.5); }
-    .ap-danger { background:linear-gradient(135deg,#3a1a3a,#5a2a4a); }
-    .ap-bonus-row { display:flex; gap:10px; align-items:center; }
-    .ap-bonus-row .ap-num { width:70px; margin-bottom:0; }
-
-    /* floating ticket animation */
-    .ticket-fly {
-      position:fixed; pointer-events:none; z-index:600;
-      font-size:1.1rem; font-weight:700; color:var(--b5);
-      animation:ticketFly 1.2s cubic-bezier(.22,1,.36,1) forwards;
-    }
-    @keyframes ticketFly {
-      0%   { opacity:1; transform:translateY(0) scale(1); }
-      60%  { opacity:1; transform:translateY(-50px) scale(1.3); }
-      100% { opacity:0; transform:translateY(-90px) scale(0.8); }
-    }
-
-    footer { position:relative; z-index:10; text-align:center; padding:44px 24px; border-top:1px solid rgba(55,138,221,0.08); }
-    footer p { font-family:'Cormorant Garamond',serif; font-size:1.05rem; font-style:italic; font-weight:300; color:var(--muted); line-height:2.1; }
-    .hb { display:inline-block; animation:hb 1.5s ease infinite; color:var(--b5); }
-    @keyframes hb { 0%,100%{transform:scale(1)} 50%{transform:scale(1.3)} }
+    footer{position:relative;z-index:10;text-align:center;padding:44px 24px;border-top:1px solid rgba(55,138,221,.08);}
+    footer p{font-family:'Cormorant Garamond',serif;font-size:1.05rem;font-style:italic;font-weight:300;color:var(--muted);line-height:2.1;}
+    .hb{display:inline-block;animation:hb 1.5s ease infinite;color:var(--b5);}
+    @keyframes hb{0%,100%{transform:scale(1)}50%{transform:scale(1.3)}}
 
     @media(max-width:600px){
-      .nav-logo{display:none} nav a{padding:6px 10px;font-size:0.65rem}
-      .game-card{padding:30px 20px} .prize-grid{grid-template-columns:1fr 1fr}
-      .hug-corner{bottom:14px;right:14px;}
+      .nav-logo{display:none;} nav a{padding:6px 10px;font-size:.65rem;}
+      .gcard{padding:24px 16px;} .tot-wrap{flex-direction:column;}
+      .prize-grid{grid-template-columns:1fr 1fr;} .hug-corner{bottom:14px;right:14px;}
     }
   </style>
 </head>
@@ -465,224 +302,182 @@
   <a href="hidden.html" class="active">✦ Hidden</a>
   <div class="nav-right">
     <div class="nav-streak">🔥 <span id="streak-num">0</span></div>
-    <div class="nav-wallet" onclick="openWallet()">🎟️ <span id="wallet-display">0</span></div>
+    <div class="nav-wallet" onclick="openWallet()">🎟️ <span id="w-display">0</span></div>
   </div>
 </nav>
 
 <main>
 
-  <!-- ══ LOCKED STATE ══ -->
-  <div id="state-locked">
-    <div class="lock-icon-wrap">🔐</div>
-    <h1 class="lock-title">Secret<br/><em>Night</em></h1>
-    <p class="lock-sub">Not everything is unlocked at once…<br/>You'll know when it's time ❤️</p>
-    <div class="lock-dots">
-      <div class="lock-dot" id="ldot0"></div>
-      <div class="lock-dot" id="ldot1"></div>
-      <div class="lock-dot" id="ldot2"></div>
-    </div>
+<!-- LOCKED -->
+<div id="state-locked">
+  <div class="lock-wrap">🔐</div>
+  <h1 class="lock-title">Secret<br/><em>Night</em></h1>
+  <p class="lock-sub">Not everything is unlocked at once…<br/>You'll know when it's time ❤️</p>
+  <div class="lock-dots">
+    <div class="lock-dot" id="ld0"></div>
+    <div class="lock-dot" id="ld1"></div>
+    <div class="lock-dot" id="ld2"></div>
   </div>
+</div>
 
-  <!-- ══ GAME STATE ══ -->
-  <div id="state-game">
-    <div class="game-hero">
-      <div class="game-tag">✦ &nbsp; a little game for you &nbsp; ✦</div>
-      <h1 class="game-title">Let's see how well<br/>you <em>know us</em> 😏</h1>
-      <p class="game-sub">Three keys. Three moments. All for you.</p>
-    </div>
-
-    <!-- KEY PROGRESS -->
-    <div class="key-progress" id="key-progress">
-      <div class="key-step">
-        <div class="key-circle active" id="kc0">📸</div>
-        <div class="key-label active" id="kl0">Memory</div>
-      </div>
-      <div class="key-connector" id="kcon0"></div>
-      <div class="key-step">
-        <div class="key-circle" id="kc1">💖</div>
-        <div class="key-label" id="kl1">Heart</div>
-      </div>
-      <div class="key-connector" id="kcon1"></div>
-      <div class="key-step">
-        <div class="key-circle" id="kc2">😏</div>
-        <div class="key-label" id="kl2">Trust</div>
-      </div>
-    </div>
-
-    <!-- ACTIVE CARD -->
-    <div class="game-card-wrap">
-      <div class="game-card" id="game-card">
-        <!-- content injected by JS -->
-      </div>
-    </div>
+<!-- GAME -->
+<div id="state-game">
+  <div class="game-hero">
+    <div class="game-tag">✦ &nbsp; a little game for you &nbsp; ✦</div>
+    <h1 class="game-title">Let's see how well<br/>you <em>know us</em> 😏</h1>
+    <p class="game-sub">Three keys. Every moment yours.</p>
   </div>
-
-  <!-- ══ PRIZE ROOM ══ -->
-  <div id="state-prize">
-    <div class="prize-hero">
-      <span class="prize-hero-icon">🎁</span>
-      <h1 class="prize-hero-title">You made it…<br/><em>now pick your reward 😏</em></h1>
-      <p class="prize-hero-sub">You earned every ticket. Spend them wisely… or don't 💙</p>
-      <div class="prize-wallet-big">🎟️ <span id="prize-wallet-num">0</span> tickets</div>
-    </div>
-    <div class="sh"><span>✦ &nbsp; love menu &nbsp; ✦</span></div>
-    <div class="prize-grid" id="prize-grid">
-      <!-- injected by JS -->
-    </div>
-    <p style="text-align:center;font-family:'Cormorant Garamond',serif;font-size:0.85rem;font-style:italic;color:var(--muted);max-width:360px;margin:0 auto 60px;line-height:1.8">
-      You can save your tickets too — they stack for next time 💙
-    </p>
+  <div class="key-prog">
+    <div class="key-step"><div class="key-circle active" id="kc0">📸</div><div class="key-lbl active" id="kl0">Memory</div></div>
+    <div class="key-conn" id="kcon0"></div>
+    <div class="key-step"><div class="key-circle" id="kc1">💖</div><div class="key-lbl" id="kl1">Heart</div></div>
+    <div class="key-conn" id="kcon1"></div>
+    <div class="key-step"><div class="key-circle" id="kc2">😏</div><div class="key-lbl" id="kl2">Trust</div></div>
   </div>
+  <div class="mini-pips" id="mini-pips"></div>
+  <div class="gcard-wrap"><div class="gcard" id="gcard"></div></div>
+</div>
+
+<!-- PRIZE ROOM -->
+<div id="state-prize">
+  <div class="prize-hero">
+    <span class="prize-icon">🎁</span>
+    <h1 class="prize-h1">You made it…<br/><em>now pick your reward 😏</em></h1>
+    <p class="prize-sub">You earned every ticket. Spend them wisely… or don't 💙</p>
+    <div class="wallet-big">🎟️ <span id="prize-w">0</span> tickets</div>
+  </div>
+  <div class="sh"><span>✦ &nbsp; love menu &nbsp; ✦</span></div>
+  <div class="prize-grid" id="prize-grid"></div>
+  <p style="text-align:center;font-family:'Cormorant Garamond',serif;font-size:.84rem;font-style:italic;color:var(--muted);max-width:340px;margin:0 auto 60px;line-height:1.8">Tickets stack — save them for something big 💙</p>
+</div>
 
 </main>
 
-<!-- HUG CORNER -->
 <div class="hug-corner">
   <div class="hug-btn" id="hug-btn">🤗</div>
-  <div class="hug-label">Are you sad mirakiii kuttiii 🥺</div>
+  <div class="hug-lbl">Are you sad mirakiii kuttiii 🥺</div>
 </div>
 
-<!-- HUG MODAL -->
 <div id="hug-overlay">
   <div class="hug-modal">
-    <span class="hug-modal-emoji" id="hug-emoji">🤗</span>
-    <div class="hug-progress-ring" id="hug-ring-wrap">
+    <span class="hug-emoji" id="hug-emoji">🤗</span>
+    <div class="hug-ring-wrap" id="hug-ring-wrap">
       <svg width="80" height="80" viewBox="0 0 80 80">
-        <circle class="hug-ring-bg"   cx="40" cy="40" r="35"/>
-        <circle class="hug-ring-fill" cx="40" cy="40" r="35" id="hug-ring-fill"/>
+        <circle class="hug-ring-bg" cx="40" cy="40" r="35"/>
+        <circle class="hug-ring-fill" cx="40" cy="40" r="35" id="hug-fill"/>
       </svg>
     </div>
-    <p class="hug-modal-title" id="hug-modal-title">Hold for a hug… 🥺</p>
-    <p class="hug-modal-sub" id="hug-modal-sub">keep holding…</p>
+    <p class="hug-title" id="hug-title">Hold for a hug… 🥺</p>
+    <p class="hug-sub" id="hug-sub">keep holding…</p>
     <p class="hug-msg" id="hug-msg"></p>
     <button class="hug-close" onclick="closeHug()">close</button>
   </div>
 </div>
 
-<!-- WALLET MODAL -->
 <div id="wallet-modal">
-  <div class="wallet-card">
-    <p class="wallet-title">🎟️ Love Wallet</p>
-    <div class="wallet-amount" id="wallet-modal-amount">0</div>
-    <p class="wallet-sub">tickets saved ✨</p>
-    <div class="wallet-history" id="wallet-history"></div>
-    <button class="wallet-close" onclick="closeWallet()">close</button>
+  <div class="w-card">
+    <p class="w-title">🎟️ Love Wallet</p>
+    <div class="w-amt" id="w-modal-amt">0</div>
+    <p class="w-sub">tickets saved ✨</p>
+    <div class="w-hist" id="w-hist"></div>
+    <button class="w-close" onclick="closeWallet()">close</button>
   </div>
 </div>
 
-<!-- ADMIN GATE -->
 <div id="admin-gate">
-  <div class="admin-modal">
-    <p class="admin-title">🔐 Admin</p>
-    <p class="admin-sub">only you know the way in</p>
-    <input type="password" class="a-input" id="admin-pw" placeholder="password" maxlength="30"/>
-    <button class="a-btn" onclick="tryAdmin()">Enter →</button>
-    <p class="a-err" id="admin-err"></p>
+  <div class="adm-card">
+    <p class="adm-title">🔐 Admin</p>
+    <p class="adm-sub">only you know the way in</p>
+    <input type="password" class="a-inp" id="adm-pw" placeholder="password" maxlength="30"/>
+    <button class="a-go" onclick="tryAdmin()">Enter →</button>
+    <p class="a-err" id="adm-err"></p>
     <button class="a-cancel" onclick="closeAdminGate()">cancel</button>
   </div>
 </div>
 
-<!-- ADMIN PANEL -->
 <div id="admin-panel">
-  <div class="ap-inner">
-    <div class="ap-hdr">
-      <p class="ap-hdr-title">⚙️ Secret Night — Admin</p>
-      <button class="ap-close" onclick="closeAdminPanel()">✕ Close</button>
-    </div>
-
-    <!-- GAME CONTROL -->
-    <div class="ap-sec">
-      <p class="ap-sec-title">🎮 Game Control</p>
-      <div class="ap-row">
-        <span class="ap-label">Game Active (show to her)</span>
-        <label class="toggle-wrap">
-          <input type="checkbox" id="ap-game-active" onchange="adminSave()"/>
-          <span class="toggle-slider"></span>
-        </label>
-      </div>
-      <div class="ap-row">
-        <span class="ap-label">Bonus Mode (extra ×2 tickets)</span>
-        <label class="toggle-wrap">
-          <input type="checkbox" id="ap-bonus-mode" onchange="adminSave()"/>
-          <span class="toggle-slider"></span>
-        </label>
-      </div>
-      <div class="ap-row">
-        <span class="ap-label">Discount Mode (prizes 50% off)</span>
-        <label class="toggle-wrap">
-          <input type="checkbox" id="ap-discount" onchange="adminSave()"/>
-          <span class="toggle-slider"></span>
-        </label>
-      </div>
-      <div class="ap-row" style="margin-top:8px">
-        <span class="ap-label">Give bonus tickets now</span>
-        <div class="ap-bonus-row">
-          <input type="number" class="ap-num" id="ap-bonus-amt" value="10" min="1" max="999"/>
-          <button class="ap-save" onclick="giveBonus()">Give</button>
-        </div>
-      </div>
-      <button class="ap-start-btn" onclick="adminStartGame()" style="margin-top:18px">▶ Start Game ❤️</button>
-      <button class="ap-start-btn ap-danger" onclick="adminResetGame()" style="margin-top:10px">↺ Reset Everything</button>
-      <p class="ap-ok" id="ap-ok-game"></p>
-    </div>
-
-    <!-- KEY 1: MEMORY -->
-    <div class="ap-sec">
-      <p class="ap-sec-title">🔑 Key 1 — Memory 📸</p>
-      <input type="text"  class="ap-input" id="ap-k1-title"    placeholder="Card title (e.g. Where did we first talk?)" oninput="adminSave()"/>
-      <input type="text"  class="ap-input" id="ap-k1-imgurl"   placeholder="Image URL (optional — leave blank to skip puzzle image)" oninput="adminSave()"/>
-      <input type="text"  class="ap-input" id="ap-k1-question" placeholder="Question text" oninput="adminSave()"/>
-      <p style="font-size:0.72rem;color:var(--muted);margin-bottom:8px;font-style:italic">Options (one per line, mark correct with ✓ at start):</p>
-      <textarea class="ap-textarea" id="ap-k1-options" placeholder="✓ The right answer&#10;A wrong option&#10;Another option" oninput="adminSave()"></textarea>
-      <input type="number" class="ap-num" id="ap-k1-tickets" value="10" min="1" oninput="adminSave()"/> <span style="font-size:0.78rem;color:var(--muted)"> tickets</span>
-      <p class="ap-ok" id="ap-ok-k1"></p>
-    </div>
-
-    <!-- KEY 2: HEART -->
-    <div class="ap-sec">
-      <p class="ap-sec-title">🔑 Key 2 — Heart 💖</p>
-      <input type="text"  class="ap-input" id="ap-k2-title"    placeholder="Card title (e.g. Read my heart…)" oninput="adminSave()"/>
-      <input type="text"  class="ap-input" id="ap-k2-question" placeholder="Romantic question" oninput="adminSave()"/>
-      <p style="font-size:0.72rem;color:var(--muted);margin-bottom:8px;font-style:italic">Options (mark ✓ for "right" — but all feel good emotionally):</p>
-      <textarea class="ap-textarea" id="ap-k2-options" placeholder="✓ When you're quiet and I can hear you think&#10;Every moment honestly&#10;When you laugh without trying" oninput="adminSave()"></textarea>
-      <input type="number" class="ap-num" id="ap-k2-tickets" value="10" min="1" oninput="adminSave()"/> <span style="font-size:0.78rem;color:var(--muted)"> tickets</span>
-    </div>
-
-    <!-- KEY 3: TRUST / DARE -->
-    <div class="ap-sec">
-      <p class="ap-sec-title">🔑 Key 3 — Trust 😏</p>
-      <input type="text"  class="ap-input" id="ap-k3-title"    placeholder="Card title (e.g. One last thing…)" oninput="adminSave()"/>
-      <p style="font-size:0.72rem;color:var(--muted);margin-bottom:8px;font-style:italic">Dare text (shown on card):</p>
-      <textarea class="ap-textarea" id="ap-k3-dare" placeholder="Say my name 5 times 😏&#10;Smile right now… I know you are 😂&#10;Send me a voice note" oninput="adminSave()"></textarea>
-      <input type="number" class="ap-num" id="ap-k3-tickets" value="10" min="1" oninput="adminSave()"/> <span style="font-size:0.78rem;color:var(--muted)"> tickets</span>
-    </div>
-
-    <!-- PRIZES -->
-    <div class="ap-sec">
-      <p class="ap-sec-title">🎁 Prize List</p>
-      <p style="font-size:0.72rem;color:var(--muted);margin-bottom:12px;font-style:italic">Each prize: emoji, name, cost, enabled toggle</p>
-      <div id="ap-prize-list"></div>
-      <button class="ap-save" onclick="addPrize()" style="margin-top:8px">+ Add Prize</button>
-    </div>
-
-    <!-- BIG GOAL -->
-    <div class="ap-sec">
-      <p class="ap-sec-title">🎯 Big Reward Goal</p>
-      <div class="ap-grid2">
-        <input type="text" class="ap-input" id="ap-goal-name" placeholder="Goal name (e.g. Special Date 💖)" oninput="adminSave()"/>
-        <input type="number" class="ap-num" id="ap-goal-tickets" value="100" min="1" oninput="adminSave()"/>
-      </div>
-    </div>
-
-    <!-- HUG MESSAGE -->
-    <div class="ap-sec">
-      <p class="ap-sec-title">🤗 Hug Message</p>
-      <textarea class="ap-textarea" id="ap-hug-msg" placeholder="The message she sees after holding 5 seconds…" oninput="adminSave()">I'm always here, even when I'm not right next to you. You never have to feel alone. I love you, mirakiii kuttiii 💙</textarea>
-    </div>
-
-    <button class="ap-save" onclick="adminSave()">💾 Save All</button>
-    <p class="ap-ok" id="ap-ok-all"></p>
+<div class="ap-in">
+  <div class="ap-hdr">
+    <p class="ap-htitle">⚙️ Secret Night — Admin</p>
+    <button class="ap-x" onclick="closeAdminPanel()">✕ Close</button>
   </div>
+
+  <div class="ap-sec">
+    <p class="ap-stitle">🎮 Game Control</p>
+    <div class="ap-row"><span class="ap-lbl">Game Active</span><label class="tog"><input type="checkbox" id="ap-active" onchange="aSave()"/><span class="tog-sl"></span></label></div>
+    <div class="ap-row"><span class="ap-lbl">Bonus Mode (×2 tickets)</span><label class="tog"><input type="checkbox" id="ap-bonus" onchange="aSave()"/><span class="tog-sl"></span></label></div>
+    <div class="ap-row"><span class="ap-lbl">Discount Mode (prizes 50% off)</span><label class="tog"><input type="checkbox" id="ap-disc" onchange="aSave()"/><span class="tog-sl"></span></label></div>
+    <div class="ap-row" style="margin-top:8px">
+      <span class="ap-lbl">Give bonus tickets now</span>
+      <div class="ap-bon-row"><input type="number" class="ap-num" id="ap-bon-amt" value="10" min="1"/><button class="ap-sv" onclick="giveBonus()">Give</button></div>
+    </div>
+    <button class="ap-big" onclick="aStart()" style="margin-top:16px">▶ Start Game ❤️</button>
+    <button class="ap-big ap-danger" onclick="aReset()" style="margin-top:10px">↺ Reset Everything</button>
+    <p class="ap-ok" id="ap-ok-ctrl"></p>
+  </div>
+
+  <div class="ap-sec">
+    <p class="ap-stitle">📸 Memory Key</p>
+    <p class="note">Game 1 — Blur photos (comma-separated URLs, up to 5)</p>
+    <textarea class="ap-ta" id="ap-blur" placeholder="https://img1.jpg, https://img2.jpg" oninput="aSave()"></textarea>
+    <div class="ap-row"><span class="ap-lbl">Hint ticket cost</span><input type="number" class="ap-num" id="ap-hint-cost" value="2" min="1" oninput="aSave()"/></div>
+    <p class="note" style="margin-top:12px">Game 2 — Emoji sequences (one per line: emoji|caption|opt1|opt2|opt3|correct_idx)</p>
+    <textarea class="ap-ta" id="ap-emoji" style="min-height:90px" placeholder="🍕🌧️🏠😂|Pizza night when it rained|Pizza night when it rained|That random walk|The call that lasted hours|0" oninput="aSave()"></textarea>
+    <p class="note" style="margin-top:12px">Game 3 — Puzzle image URL</p>
+    <input type="text" class="ap-inp" id="ap-puzzle" placeholder="https://your-photo.jpg" oninput="aSave()"/>
+    <p class="note" style="margin-top:12px">Game 4 — Chat match. Format: me:text or you:text per line, then --- then options (✓ marks correct)</p>
+    <textarea class="ap-ta" id="ap-chat" style="min-height:110px" placeholder="me:I miss you…&#10;---&#10;✓ Come then 😏&#10;I miss you more ❤️&#10;Okay" oninput="aSave()"></textarea>
+    <input type="text" class="ap-inp" id="ap-chat-react" placeholder="Reaction: This was my favorite moment…" oninput="aSave()"/>
+    <p class="note" style="margin-top:12px">Game 5 — Sound memory (audio URL, question, options one per line with ✓)</p>
+    <input type="text" class="ap-inp" id="ap-sound-url" placeholder="https://audio.mp3" oninput="aSave()"/>
+    <input type="text" class="ap-inp" id="ap-sound-q" placeholder="What is this from?" oninput="aSave()"/>
+    <textarea class="ap-ta" id="ap-sound-opts" placeholder="✓ Our first call&#10;That night walk&#10;Random voice note" oninput="aSave()"></textarea>
+  </div>
+
+  <div class="ap-sec">
+    <p class="ap-stitle">💖 Heart Key</p>
+    <p class="note">Love Meter questions (one per line: question|opt1|opt2|opt3|correct_idx|meter%)</p>
+    <textarea class="ap-ta" id="ap-love" style="min-height:90px" placeholder="When do I miss you the most?|When you go quiet|Every single moment|When you laugh|1|88" oninput="aSave()"></textarea>
+    <p class="note" style="margin-top:12px">This or That pairs (one per line: optA|optB|your_answer_A_or_B)</p>
+    <textarea class="ap-ta" id="ap-tot" placeholder="Morning texts|Late night calls|B&#10;Cuddles|Kisses|A&#10;Movie night in|Stargazing outside|B" oninput="aSave()"></textarea>
+  </div>
+
+  <div class="ap-sec">
+    <p class="ap-stitle">😏 Trust Key — Dare</p>
+    <textarea class="ap-ta" id="ap-dare" placeholder="Say my name 5 times 😏&#10;Smile right now… I know you are 😂&#10;Send me a voice note 🎧" oninput="aSave()"></textarea>
+  </div>
+
+  <div class="ap-sec">
+    <p class="ap-stitle">🎟️ Ticket Amounts</p>
+    <div class="ap-row"><span class="ap-lbl">Memory (per mini-game)</span><input type="number" class="ap-num" id="ap-mt" value="10" min="1" oninput="aSave()"/></div>
+    <div class="ap-row"><span class="ap-lbl">Heart (per mini-game)</span><input type="number" class="ap-num" id="ap-ht" value="10" min="1" oninput="aSave()"/></div>
+    <div class="ap-row"><span class="ap-lbl">Trust Key</span><input type="number" class="ap-num" id="ap-tt" value="10" min="1" oninput="aSave()"/></div>
+    <div class="ap-row"><span class="ap-lbl">Early guess bonus (&lt;5 sec)</span><input type="number" class="ap-num" id="ap-eb" value="5" min="0" oninput="aSave()"/></div>
+    <div class="ap-row"><span class="ap-lbl">No-replay sound bonus</span><input type="number" class="ap-num" id="ap-rb" value="5" min="0" oninput="aSave()"/></div>
+  </div>
+
+  <div class="ap-sec">
+    <p class="ap-stitle">🎁 Prize List</p>
+    <div id="ap-prizes"></div>
+    <button class="ap-sv" onclick="addPrize()" style="margin-top:8px">+ Add Prize</button>
+  </div>
+
+  <div class="ap-sec">
+    <p class="ap-stitle">🎯 Big Reward Goal</p>
+    <div class="ap-g2">
+      <input type="text" class="ap-inp" id="ap-goal" placeholder="Special Date 💖" oninput="aSave()"/>
+      <input type="number" class="ap-num" id="ap-goal-t" value="100" min="1" oninput="aSave()"/>
+    </div>
+  </div>
+
+  <div class="ap-sec">
+    <p class="ap-stitle">🤗 Hug Message</p>
+    <textarea class="ap-ta" id="ap-hug" oninput="aSave()">I'm always here, even when I'm not right next to you. You never have to feel alone. I love you, mirakiii kuttiii 💙</textarea>
+  </div>
+
+  <button class="ap-sv" onclick="aSave()">💾 Save All</button>
+  <p class="ap-ok" id="ap-ok-all"></p>
+</div>
 </div>
 
 <footer>
@@ -690,635 +485,658 @@
 </footer>
 
 <script>
-// ══════════════════════════════════════════
-// STORAGE HELPERS
-// ══════════════════════════════════════════
-const ADMIN_PASS = 'cedric1905';
+// ════════════════════════════════════
+// STORAGE
+// ════════════════════════════════════
+const PASS = 'cedric1905';
+const gC = () => { try{ return JSON.parse(localStorage.getItem('hn_cfg')||'null') || dCfg(); }catch{ return dCfg(); } };
+const sC = c => localStorage.setItem('hn_cfg', JSON.stringify(c));
+const gS = () => { try{ return JSON.parse(localStorage.getItem('hn_st')||'null') || dSt(); }catch{ return dSt(); } };
+const sS = s => localStorage.setItem('hn_st', JSON.stringify(s));
 
-function getConfig()  { try { return JSON.parse(localStorage.getItem('hidden_cfg') || 'null') || defaultConfig(); } catch { return defaultConfig(); } }
-function saveConfig(c){ localStorage.setItem('hidden_cfg', JSON.stringify(c)); }
-function getState()   { try { return JSON.parse(localStorage.getItem('hidden_state') || 'null') || defaultState(); } catch { return defaultState(); } }
-function saveState(s) { localStorage.setItem('hidden_state', JSON.stringify(s)); }
-
-function defaultConfig() {
+function dCfg(){
   return {
-    gameActive: false,
-    bonusMode: false,
-    discount: false,
-    hugMsg: "I'm always here, even when I'm not right next to you. You never have to feel alone. I love you, mirakiii kuttiii 💙",
-    keys: [
-      { title:'Do you remember…', imgUrl:'', question:'Where did we first really talk?', options:['✓ You know where 😏','Somewhere random','I forget honestly'], tickets:10 },
-      { title:'Read my heart…', question:'When do I miss you the most?', options:['✓ When you go quiet and I wonder what you\'re thinking','Every single moment honestly','When you laugh without trying'], tickets:10 },
-      { title:'One last thing…', dare:'Say my name 5 times 😏\nSmile right now… I know you are 😂\nSend me a voice note 🎧', tickets:10 },
+    active:false, bonus:false, disc:false,
+    blurImgs:[], hintCost:2,
+    emojiSeqs:[{emoji:'🍕🌧️🏠😂',caption:'Pizza night when it rained 😂',opts:['Pizza night when it rained 😂','That random walk','The call that lasted hours'],correct:0}],
+    puzzleImg:'',
+    chatLines:['me:I miss you…'], chatOpts:['Come then 😏','I miss you more ❤️','Okay'], chatCorrect:0, chatReact:'This was my favorite moment… 💙',
+    soundUrl:'', soundQ:'What is this from?', soundOpts:['Our first call','That night walk','Random voice note'], soundCorrect:0,
+    loveQs:[{q:'When do I miss you the most?',opts:['When you go quiet','Every single moment','When you laugh'],correct:1,meter:88}],
+    totPairs:[{a:'Morning texts',b:'Late night calls',ans:'B'},{a:'Cuddles',b:'Kisses',ans:'A'}],
+    dare:'Say my name 5 times 😏\nSmile right now… I know you are 😂\nSend me a voice note 🎧',
+    mt:10, ht:10, tt:10, eb:5, rb:5,
+    prizes:[
+      {e:'🤗',n:'Hug',c:5,on:true},{e:'💋',n:'Kiss',c:5,on:true},
+      {e:'🍫',n:'Chocolate',c:10,on:true},{e:'📞',n:'Call',c:8,on:true},
+      {e:'🎁',n:'Surprise',c:20,on:true},{e:'😏',n:"I'll do anything",c:25,on:true},
     ],
-    prizes: [
-      { emoji:'🤗', name:'Hug',         cost:5,  enabled:true,  limited:'' },
-      { emoji:'💋', name:'Kiss',        cost:5,  enabled:true,  limited:'' },
-      { emoji:'🍫', name:'Chocolate',   cost:10, enabled:true,  limited:'' },
-      { emoji:'📞', name:'Call',        cost:8,  enabled:true,  limited:'' },
-      { emoji:'🎁', name:'Surprise',    cost:20, enabled:true,  limited:'' },
-      { emoji:'😏', name:"I'll do anything", cost:25, enabled:true, limited:'' },
-    ],
-    goalName: 'Special Date 💖',
-    goalTickets: 100,
+    goal:'Special Date 💖', goalT:100,
+    hugMsg:"I'm always here, even when I'm not right next to you. You never have to feel alone. I love you, mirakiii kuttiii 💙",
   };
 }
-function defaultState() {
-  return { keysUnlocked:0, tickets:0, history:[], claimedPrizes:[] };
-}
+function dSt(){ return {keys:0, mg:0, hg:0, tickets:0, hist:[], claimed:[]}; }
 
-// ══════════════════════════════════════════
+// ════════════════════════════════════
 // INIT
-// ══════════════════════════════════════════
-const streak = parseInt(localStorage.getItem('mirakiii_streak') || '0');
-document.getElementById('streak-num').textContent = streak;
+// ════════════════════════════════════
+document.getElementById('streak-num').textContent = localStorage.getItem('mirakiii_streak')||'0';
+let C = gC(), S = gS();
+wDisplay(); renderPage();
 
-let cfg   = getConfig();
-let state = getState();
+function renderPage(){
+  C = gC(); S = gS();
+  const locked = document.getElementById('state-locked');
+  const game   = document.getElementById('state-game');
+  const prize  = document.getElementById('state-prize');
+  locked.style.display='none'; game.style.display='none'; prize.style.display='none';
+  if(!C.active){ locked.style.display='flex'; for(let i=0;i<3;i++) document.getElementById('ld'+i).classList.toggle('lit',i<S.keys); }
+  else if(S.keys>=3){ prize.style.display='block'; document.getElementById('prize-w').textContent=S.tickets; renderPrizes(); }
+  else { game.style.display='block'; updateKeyBar(); renderGame(); }
+}
 
-renderWalletDisplay();
-renderPage();
-
-function renderPage() {
-  cfg = getConfig();
-  if (!cfg.gameActive) {
-    showLocked();
-  } else if (state.keysUnlocked >= 3) {
-    showPrize();
-  } else {
-    showGame();
+// ════════════════════════════════════
+// KEY BAR
+// ════════════════════════════════════
+function updateKeyBar(){
+  const k=S.keys;
+  for(let i=0;i<3;i++){
+    document.getElementById('kc'+i).classList.toggle('active',i===k);
+    document.getElementById('kc'+i).classList.toggle('done',i<k);
+    document.getElementById('kl'+i).classList.toggle('active',i===k);
   }
+  for(let i=0;i<2;i++) document.getElementById('kcon'+i).classList.toggle('done',i<k);
 }
 
-// ══════════════════════════════════════════
-// STATES
-// ══════════════════════════════════════════
-function showLocked() {
-  document.getElementById('state-locked').style.display = 'flex';
-  document.getElementById('state-game').style.display   = 'none';
-  document.getElementById('state-prize').style.display  = 'none';
-  // light up dots for unlocked keys
-  for (let i = 0; i < 3; i++) {
-    document.getElementById('ldot' + i).classList.toggle('lit', i < state.keysUnlocked);
-  }
+// ════════════════════════════════════
+// GAME ROUTING  key 0=5 games, 1=2 games, 2=1 game
+// ════════════════════════════════════
+const SIZES = [5, 2, 1];
+
+function renderGame(){
+  const k=S.keys, total=SIZES[k], idx=k===0?S.mg:k===1?S.hg:0;
+  // pips
+  const pips=document.getElementById('mini-pips');
+  pips.innerHTML='';
+  if(total>1){ for(let i=0;i<total;i++){ const p=mkD('div','mpip'+(i<idx?' done':i===idx?' cur':'')); pips.appendChild(p); } }
+  // card
+  const card=document.getElementById('gcard');
+  card.innerHTML=''; card.style.animation='none'; void card.offsetWidth; card.style.animation='';
+  if(k===0) memGames[idx](card);
+  else if(k===1) heartGames[idx](card);
+  else trustGame(card);
 }
 
-function showGame() {
-  document.getElementById('state-locked').style.display = 'none';
-  document.getElementById('state-game').style.display   = 'block';
-  document.getElementById('state-prize').style.display  = 'none';
-  updateKeyProgress();
-  renderActiveKey();
+function nextGame(){
+  const k=S.keys;
+  if(k===0){ S.mg++; if(S.mg>=SIZES[0]){ keyDone(); return; } }
+  else if(k===1){ S.hg++; if(S.hg>=SIZES[1]){ keyDone(); return; } }
+  else{ keyDone(); return; }
+  sS(S); setTimeout(()=>renderGame(), 700);
 }
 
-function showPrize() {
-  document.getElementById('state-locked').style.display = 'none';
-  document.getElementById('state-game').style.display   = 'none';
-  document.getElementById('state-prize').style.display  = 'block';
-  document.getElementById('prize-wallet-num').textContent = state.tickets;
-  renderPrizeGrid();
+function keyDone(){
+  S.keys++;
+  sS(S);
+  if(S.keys>=3){ setTimeout(()=>{ renderPage(); }, 900); }
+  else{ S.mg=0; S.hg=0; sS(S); setTimeout(()=>{ updateKeyBar(); renderGame(); }, 800); }
 }
 
-// ══════════════════════════════════════════
-// KEY PROGRESS BAR
-// ══════════════════════════════════════════
-function updateKeyProgress() {
-  const k = state.keysUnlocked;
-  for (let i = 0; i < 3; i++) {
-    const circle = document.getElementById('kc' + i);
-    const label  = document.getElementById('kl' + i);
-    circle.classList.toggle('active', i === k);
-    circle.classList.toggle('done',   i < k);
-    label.classList.toggle('active',  i === k);
-  }
-  for (let i = 0; i < 2; i++) {
-    document.getElementById('kcon' + i).classList.toggle('done', i < k);
-  }
+// ════════════════════════════════════
+// TICKETS
+// ════════════════════════════════════
+function earn(n, lbl){
+  const total = C.bonus ? n*2 : n;
+  S.tickets += total;
+  S.hist.push({l:lbl, a:total, d:new Date().toLocaleDateString()});
+  sS(S); wDisplay(); fly(total);
 }
+function wDisplay(){ S=gS(); document.getElementById('w-display').textContent=S.tickets; }
 
-// ══════════════════════════════════════════
-// RENDER ACTIVE KEY CARD
-// ══════════════════════════════════════════
-function renderActiveKey() {
-  const k   = state.keysUnlocked;
-  const kd  = cfg.keys[k];
-  const card = document.getElementById('game-card');
-  const mult = cfg.bonusMode ? 2 : 1;
-  const tickets = (kd.tickets || 10) * mult;
+// ════════════════════════════════════
+// MEMORY KEY — 5 GAMES
+// ════════════════════════════════════
+const memGames = [gBlur, gEmoji, gPuzzle, gChat, gSound];
 
-  card.innerHTML = '';
-  card.style.animation = 'none';
-  void card.offsetWidth;
-  card.style.animation = '';
+// ── GAME 1: BLUR REVEAL ──────────────────
+function gBlur(card){
+  const imgs = C.blurImgs?.length ? C.blurImgs : ['https://picsum.photos/seed/love1/400/400','https://picsum.photos/seed/love2/400/400'];
+  let pi=0, blur=22, sec=15, iv=null, done=false, t0=Date.now();
+  const tickets = C.mt||10;
 
-  const badge = document.createElement('div');
-  badge.className = 'gc-key-badge';
-  const icons = ['📸 Memory Key','💖 Heart Key','😏 Trust Key'];
-  badge.textContent = icons[k];
-  card.appendChild(badge);
+  const badge=mkD('div','gc-badge','📸 Memory Key — Blur Reveal');
+  const title=mkD('div','gc-title','What memory is this?');
+  const pctr=mkD('div','photo-ctr',`Photo ${pi+1} / ${imgs.length}`);
+  const tlbl=mkD('div','t-lbl','15s');
+  const tbwrap=mkD('div','t-bar-wrap'); const tbar=mkD('div','t-bar'); tbar.style.width='100%'; tbwrap.appendChild(tbar);
+  const rwd=mkD('div','gc-reward',`🎟️ +${tickets} tickets this game`);
+  const iWrap=mkD('div','blur-img');
+  const img=document.createElement('img'); img.src=imgs[pi]; img.style.filter=`blur(${blur}px)`;
+  const tapHint=mkD('div','blur-hint-txt','tap photo to clear faster');
+  iWrap.append(img,tapHint);
+  const hintBtn=document.createElement('button'); hintBtn.className='ghost-btn'; hintBtn.style.marginBottom='12px';
+  hintBtn.innerHTML=`💡 Hint <span class="hint-cost-note">−${C.hintCost||2} tickets</span>`;
+  const optsEl=mkD('div','opts');
+  card.append(badge,title,pctr,rwd,tbwrap,tlbl,iWrap,hintBtn,optsEl);
+  setTimeout(()=>rwd.classList.add('show'),300);
 
-  const title = document.createElement('div');
-  title.className = 'gc-title';
-  title.textContent = kd.title || icons[k];
-  card.appendChild(title);
-
-  const reward = document.createElement('div');
-  reward.className = 'gc-reward-flash';
-  reward.id = 'reward-flash';
-  reward.innerHTML = `🎟️ +${tickets} tickets waiting…`;
-  card.appendChild(reward);
-  setTimeout(() => reward.classList.add('show'), 300);
-
-  if (k === 0) renderMemoryKey(card, kd, tickets);
-  else if (k === 1) renderHeartKey(card, kd, tickets);
-  else renderTrustKey(card, kd, tickets);
-}
-
-function renderMemoryKey(card, kd, tickets) {
-  if (kd.imgUrl) {
-    const pw = document.createElement('div');
-    pw.className = 'puzzle-img-wrap';
-    const img = document.createElement('img');
-    img.src = kd.imgUrl;
-    img.className = 'blurred';
-    img.id = 'puzzle-img';
-    pw.appendChild(img);
-    card.appendChild(pw);
-    const hint = document.createElement('p');
-    hint.className = 'puzzle-reveal-hint';
-    hint.textContent = '✦ answer correctly to reveal the memory…';
-    card.appendChild(hint);
-  }
-  renderQuestion(card, kd, tickets, 0);
-}
-
-function renderHeartKey(card, kd, tickets) {
-  const desc = document.createElement('p');
-  desc.className = 'gc-desc';
-  desc.textContent = 'There are no wrong answers here…';
-  card.appendChild(desc);
-  renderQuestion(card, kd, tickets, 1);
-}
-
-function renderTrustKey(card, kd, tickets) {
-  const dareBox = document.createElement('div');
-  dareBox.className = 'gc-dare';
-  dareBox.innerHTML = (kd.dare || 'Do something sweet for me 😏').replace(/\n/g, '<br/>');
-  card.appendChild(dareBox);
-
-  const desc = document.createElement('p');
-  desc.className = 'gc-desc';
-  desc.style.marginBottom = '22px';
-  desc.textContent = 'Once you\'ve done it… tap below 💙';
-  card.appendChild(desc);
-
-  const btn = document.createElement('button');
-  btn.className = 'gc-btn';
-  btn.textContent = 'Done 😏 ✓';
-  btn.onclick = () => unlockKey(tickets);
-  card.appendChild(btn);
-}
-
-function renderQuestion(card, kd, tickets, keyIdx) {
-  const q = document.createElement('p');
-  q.className = 'gc-question';
-  q.textContent = kd.question || 'Answer carefully…';
-  card.appendChild(q);
-
-  const opts = (kd.options || []);
-  const optContainer = document.createElement('div');
-  optContainer.className = 'gc-options';
-
-  // shuffle
-  const shuffled = [...opts].sort(() => Math.random() - 0.5);
-
-  shuffled.forEach(opt => {
-    const btn = document.createElement('button');
-    btn.className = 'gc-option';
-    const isCorrect = opt.trim().startsWith('✓');
-    btn.textContent = opt.replace(/^✓\s*/, '');
-    btn.onclick = () => handleAnswer(btn, isCorrect, keyIdx, tickets, optContainer);
-    optContainer.appendChild(btn);
+  // options — tap to guess
+  ['I remember this 💖','Hmm… maybe?','Not sure yet…'].forEach((o,i)=>{
+    const b=mkD('button','opt',o);
+    b.onclick=()=>{ if(done) return; done=true; clearInterval(iv);
+      const el=(Date.now()-t0)/1000, bon=el<5?C.eb||5:el<10?3:0;
+      img.style.filter='none'; tapHint.style.display='none';
+      optsEl.querySelectorAll('.opt').forEach(x=>{x.disabled=true;x.style.opacity='.42';});
+      b.style.opacity='1'; b.classList.add('correct');
+      earn(tickets+bon, 'Memory: Blur Reveal');
+      const rl=mkD('div','result-line',(bon?`Early guess! 🎟️ +${bon} bonus!`:'You saw it 💖')); rl.style.color='var(--b5)'; card.appendChild(rl);
+      setTimeout(()=>nextGame(),1600);
+    };
+    optsEl.appendChild(b);
   });
 
-  card.appendChild(optContainer);
+  iWrap.onclick=()=>{ if(done) return; blur=Math.max(0,blur-2.5); img.style.filter=`blur(${blur}px)`; };
+  hintBtn.onclick=()=>{ if(S.tickets<(C.hintCost||2)){ toast('Not enough tickets 😅'); return; }
+    S.tickets-=(C.hintCost||2); S.hist.push({l:'Hint',a:-(C.hintCost||2),d:new Date().toLocaleDateString()}); sS(S); wDisplay();
+    blur=Math.max(0,blur-8); img.style.filter=`blur(${blur}px)`; toast(`−${C.hintCost||2} 🎟️ — blur reduced!`);
+  };
+
+  iv=setInterval(()=>{ if(done) return; sec--;
+    tlbl.textContent=sec+'s'; tbar.style.width=(sec/15*100)+'%';
+    blur=Math.max(0,22-(22-sec)*1.6); img.style.filter=`blur(${blur}px)`;
+    if(sec<=0){ clearInterval(iv); if(!done){ done=true; img.style.filter='none'; earn(tickets,'Memory: Blur Reveal');
+      const rl=mkD('div','result-line',"Time's up… look at us though 💖"); rl.style.color='var(--b5)'; card.appendChild(rl);
+      setTimeout(()=>nextGame(),1600); } }
+  },1000);
 }
 
-function handleAnswer(btn, isCorrect, keyIdx, tickets, container) {
-  // Disable all options
-  container.querySelectorAll('.gc-option').forEach(b => {
-    b.onclick = null;
-    b.style.opacity = '0.55';
+// ── GAME 2: EMOJI DECODER ───────────────
+function gEmoji(card){
+  const seqs=C.emojiSeqs?.length?C.emojiSeqs:[{emoji:'🍕🌧️🏠😂',caption:'Pizza night when it rained 😂',opts:['Pizza night when it rained 😂','That random walk','The call that lasted hours'],correct:0}];
+  const seq=seqs[Math.floor(Math.random()*seqs.length)];
+  let done=false;
+  const tickets=C.mt||10;
+
+  const badge=mkD('div','gc-badge','📸 Memory Key — Emoji Decoder');
+  const title=mkD('div','gc-title','What memory is this? 😏');
+  const desc=mkD('div','gc-desc','Read the emojis… what does it remind you of?');
+  const emoEl=mkD('div','emoji-seq',seq.emoji);
+  const rwd=mkD('div','gc-reward',`🎟️ +${tickets} tickets`);
+  const shuffBtn=document.createElement('button'); shuffBtn.className='ghost-btn'; shuffBtn.style.marginBottom='12px'; shuffBtn.textContent='🔁 Shuffle options';
+  const optsEl=mkD('div','opts');
+  card.append(badge,title,desc,emoEl,rwd,shuffBtn,optsEl);
+  setTimeout(()=>rwd.classList.add('show'),300);
+
+  function buildOpts(){
+    optsEl.innerHTML='';
+    [...seq.opts].sort(()=>Math.random()-.5).forEach(o=>{
+      const isOk=o===seq.opts[seq.correct];
+      const b=mkD('button','opt',o);
+      b.onclick=()=>{ if(done) return; done=true;
+        optsEl.querySelectorAll('.opt').forEach(x=>{x.disabled=true;x.style.opacity='.42';});
+        b.style.opacity='1'; b.classList.add(isOk?'correct':'wrong');
+        const cap=mkD('div','caption-reveal',`"${seq.caption}" 💙`); card.appendChild(cap);
+        earn(tickets,'Memory: Emoji Decoder');
+        const rl=mkD('div','result-line',isOk?'You remembered 😏💖':'Still… I love this answer 🥺'); rl.style.color='var(--b5)'; card.appendChild(rl);
+        setTimeout(()=>nextGame(),1800);
+      };
+      optsEl.appendChild(b);
+    });
+  }
+  buildOpts();
+  shuffBtn.onclick=()=>{ if(!done) buildOpts(); };
+}
+
+// ── GAME 3: SLIDING PUZZLE ───────────────
+function gPuzzle(card){
+  const src=C.puzzleImg||'https://picsum.photos/seed/puzzle1/300/300';
+  const N=3, T=N*N;
+  let tiles=Array.from({length:T},(_,i)=>i), sel=null, solved=false;
+  let sec=20, iv=null, t0=Date.now();
+  const tickets=C.mt||10;
+
+  // Shuffle via valid swaps
+  for(let i=0;i<300;i++){ const a=Math.floor(Math.random()*T), b=Math.floor(Math.random()*T); [tiles[a],tiles[b]]=[tiles[b],tiles[a]]; }
+
+  const badge=mkD('div','gc-badge','📸 Memory Key — Puzzle 🧩');
+  const title=mkD('div','gc-title','Put us back together 🧩');
+  const desc=mkD('div','gc-desc','Tap two tiles to swap them.');
+  const tlbl=mkD('div','t-lbl','20s');
+  const tbwrap=mkD('div','t-bar-wrap'); const tbar=mkD('div','t-bar'); tbar.style.width='100%'; tbwrap.appendChild(tbar);
+  const rwd=mkD('div','gc-reward',`🎟️ +${tickets} tickets`);
+  const grid=mkD('div','puzzle-grid');
+  const W=Math.min(window.innerWidth-80,270);
+  grid.style.cssText=`width:${W}px;height:${W}px;grid-template-columns:repeat(${N},1fr);margin:0 auto 12px;`;
+  card.append(badge,title,desc,rwd,tbwrap,tlbl,grid);
+  setTimeout(()=>rwd.classList.add('show'),300);
+
+  function draw(){
+    grid.innerHTML='';
+    tiles.forEach((t,i)=>{
+      const tile=mkD('div','ptile'+(t===0?' empty':'')+(i===sel?' sel':''));
+      if(t!==0){
+        const r=Math.floor((t-1)/N), co=(t-1)%N;
+        tile.style.backgroundImage=`url(${src})`;
+        tile.style.backgroundSize=`${N*100}%`;
+        tile.style.backgroundPosition=`${N===1?0:co/(N-1)*100}% ${N===1?0:r/(N-1)*100}%`;
+      }
+      tile.onclick=()=>pick(i);
+      grid.appendChild(tile);
+    });
+  }
+
+  function pick(i){
+    if(solved) return;
+    if(sel===null){ sel=i; draw(); return; }
+    if(sel===i){ sel=null; draw(); return; }
+    [tiles[sel],tiles[i]]=[tiles[i],tiles[sel]];
+    const prevSel=sel; sel=null; draw();
+    // snap anim
+    if(grid.children[i]) grid.children[i].classList.add('snap');
+    setTimeout(()=>grid.children[i]?.classList.remove('snap'),280);
+    // check
+    if(tiles.every((t,idx)=>t===(idx+1)%T)){
+      solved=true; clearInterval(iv);
+      const el=(Date.now()-t0)/1000, bon=el<10?C.eb||5:0;
+      earn(tickets+bon,'Memory: Puzzle');
+      const msg=mkD('div','puzzle-done','You completed us again ❤️'+(bon?` +${bon} bonus!`:'')); card.appendChild(msg);
+      setTimeout(()=>nextGame(),1900);
+    }
+  }
+
+  draw();
+  iv=setInterval(()=>{ if(solved) return; sec--;
+    tlbl.textContent=sec+'s'; tbar.style.width=(sec/20*100)+'%';
+    if(sec<=0){ clearInterval(iv); if(!solved){ solved=true; earn(tickets,'Memory: Puzzle');
+      const msg=mkD('div','puzzle-done',"Time's up — we're still whole 💙"); card.appendChild(msg);
+      setTimeout(()=>nextGame(),1600); } }
+  },1000);
+}
+
+// ── GAME 4: CHAT MATCH ──────────────────
+function gChat(card){
+  const raw=(C.chatLines||['me:I miss you…']).join('\n');
+  const parts=raw.split('---');
+  const lines=(parts[0]||'').trim().split('\n').filter(Boolean);
+  const opts=C.chatOpts||['Come then 😏','I miss you more ❤️','Okay'];
+  const correct=C.chatCorrect||0;
+  const reaction=C.chatReact||'This was my favorite moment… 💙';
+  let done=false;
+  const tickets=C.mt||10;
+
+  const badge=mkD('div','gc-badge','📸 Memory Key — Chat Match 💬');
+  const title=mkD('div','gc-title','What happens next? 💬');
+  const desc=mkD('div','gc-desc','Remember this moment…');
+  const chatBox=mkD('div','chat-box');
+  lines.forEach((l,i)=>{
+    const isMe=l.startsWith('me:');
+    const txt=l.replace(/^(me|you):/,'');
+    const row=mkD('div','cmsg '+(isMe?'me':'you'));
+    const bub=mkD('div','cbubble',txt);
+    row.appendChild(bub); row.style.animationDelay=(i*.12)+'s';
+    chatBox.appendChild(row);
   });
-  btn.style.opacity = '1';
+  const rwd=mkD('div','gc-reward',`🎟️ +${tickets} tickets`);
+  const optsEl=mkD('div','opts');
+  card.append(badge,title,desc,chatBox,rwd,optsEl);
+  setTimeout(()=>rwd.classList.add('show'),300);
 
-  if (keyIdx === 1) {
-    // Heart key — all answers feel right
-    btn.classList.add('correct');
-    showAnswerReaction('That's so sweet… 💕', true);
-    setTimeout(() => unlockKey(tickets), 1400);
-  } else if (isCorrect) {
-    btn.classList.add('correct');
-    // reveal image if exists
-    const img = document.getElementById('puzzle-img');
-    if (img) { img.classList.remove('blurred'); img.classList.add('clear'); }
-    showAnswerReaction('You remembered 😏💖', true);
-    setTimeout(() => unlockKey(tickets), 1600);
-  } else {
-    btn.classList.add('wrong');
-    showAnswerReaction('Not quite… try again 🥺', false);
-    setTimeout(() => {
-      container.querySelectorAll('.gc-option').forEach(b => {
-        b.style.opacity = '1';
-        b.onclick = () => handleAnswer(b, b.dataset.correct === '1', keyIdx, tickets, container);
-      });
-      // re-attach correct data
-      container.querySelectorAll('.gc-option').forEach((b, i) => {
-        const origText = b.textContent;
-        // re-read from cfg
-      });
-    }, 900);
+  [...opts].map((o,i)=>({o,i})).sort(()=>Math.random()-.5).forEach(({o,i})=>{
+    const b=mkD('button','opt',o);
+    const isOk=i===correct;
+    b.onclick=()=>{ if(done) return; done=true;
+      optsEl.querySelectorAll('.opt').forEach(x=>{x.disabled=true;x.style.opacity='.42';});
+      b.style.opacity='1'; b.classList.add(isOk?'correct':'wrong');
+      // reveal full chat
+      const reveal=mkD('div','cmsg me');
+      const rbub=mkD('div','cbubble',opts[correct]); reveal.appendChild(rbub); chatBox.appendChild(reveal);
+      chatBox.scrollTop=chatBox.scrollHeight;
+      const react=mkD('div','chat-react',`"${reaction}"`); card.appendChild(react);
+      earn(tickets,'Memory: Chat Match');
+      const rl=mkD('div','result-line',isOk?'You remembered every word 😏💖':'Still so cute… 🥺'); rl.style.color='var(--b5)'; card.appendChild(rl);
+      setTimeout(()=>nextGame(),2000);
+    };
+    optsEl.appendChild(b);
+  });
+}
+
+// ── GAME 5: SOUND MEMORY ───────────────
+function gSound(card){
+  const url=C.soundUrl||'';
+  const q=C.soundQ||'What is this from?';
+  const opts=C.soundOpts||['Our first call','That night walk','Random voice note'];
+  const correct=C.soundCorrect||0;
+  const MAX=2;
+  let plays=0, usedReplay=false, done=false;
+  const tickets=C.mt||10;
+
+  let aud=null;
+  if(url){ aud=new Audio(url); aud.preload='auto'; }
+
+  const badge=mkD('div','gc-badge','📸 Memory Key — Sound Memory 🎧');
+  const title=mkD('div','gc-title','Close your eyes… listen 🎧');
+  const desc=mkD('div','gc-desc',q);
+  const rwd=mkD('div','gc-reward',`🎟️ +${tickets} tickets`);
+  const playBtn=mkD('div','sound-play-btn','▶️');
+  const wave=mkD('div','sound-wave');
+  for(let i=0;i<5;i++) wave.appendChild(mkD('div','sw',''));
+  const rpInfo=mkD('div','replay-info',url?`${MAX} replays max — bonus if you answer first try!`:'(no audio set)');
+  const optsEl=mkD('div','opts');
+  card.append(badge,title,desc,rwd,playBtn,wave,rpInfo,optsEl);
+  setTimeout(()=>rwd.classList.add('show'),300);
+
+  playBtn.onclick=()=>{
+    if(!aud){ return; }
+    if(plays>=MAX){ toast('No more replays 😅'); return; }
+    if(plays>0) usedReplay=true;
+    aud.currentTime=0; aud.play(); plays++;
+    wave.classList.add('playing');
+    aud.onended=()=>wave.classList.remove('playing');
+    if(plays>=MAX){ playBtn.classList.add('disabled'); rpInfo.textContent='No replays left'; }
+    else rpInfo.textContent=`${MAX-plays} replay${MAX-plays===1?'':'s'} left`;
+  };
+  if(!url) playBtn.style.opacity='.35';
+
+  opts.forEach((o,i)=>{
+    const b=mkD('button','opt',o); const isOk=i===correct;
+    b.onclick=()=>{ if(done) return; done=true;
+      if(aud){ aud.pause(); wave.classList.remove('playing'); }
+      optsEl.querySelectorAll('.opt').forEach(x=>{x.disabled=true;x.style.opacity='.42';});
+      b.style.opacity='1'; b.classList.add(isOk?'correct':'wrong');
+      const bon=(!usedReplay&&isOk)?(C.rb||5):0;
+      earn(tickets+bon,'Memory: Sound Memory');
+      const rl=mkD('div','result-line',isOk?(bon>0?`First try! 🎧 +${bon} bonus!`:'You recognized it 💖'):'Still… I love you for trying 🥺');
+      rl.style.color='var(--b5)'; card.appendChild(rl);
+      setTimeout(()=>nextGame(),1700);
+    };
+    optsEl.appendChild(b);
+  });
+
+  if(!url){
+    const skip=mkD('button','gc-btn','Skip (no audio set)'); skip.style.marginTop='12px';
+    skip.onclick=()=>{ earn(tickets,'Memory: Sound Memory'); nextGame(); };
+    card.appendChild(skip);
   }
 }
 
-function showAnswerReaction(text, good) {
-  const existing = document.getElementById('answer-reaction');
-  if (existing) existing.remove();
-  const r = document.createElement('div');
-  r.id = 'answer-reaction';
-  r.style.cssText = `text-align:center;font-family:'Playfair Display',serif;font-size:0.9rem;font-style:italic;margin-top:12px;color:${good ? 'var(--b5)' : 'var(--muted)'};animation:fadeUp 0.3s ease both`;
-  r.textContent = text;
-  document.getElementById('game-card').appendChild(r);
-}
+// ════════════════════════════════════
+// HEART KEY — 2 GAMES
+// ════════════════════════════════════
+const heartGames = [gLoveMeter, gThisOrThat];
 
-function unlockKey(tickets) {
-  state.keysUnlocked++;
-  addTickets(tickets, ['Memory Key 🔑','Heart Key 💖','Trust Key 😏'][state.keysUnlocked - 1]);
-  saveState(state);
+// ── GAME 1: LOVE METER ──────────────
+function gLoveMeter(card){
+  const qs=C.loveQs?.length?C.loveQs:[{q:'When do I miss you the most?',opts:['When you go quiet','Every single moment','When you laugh'],correct:1,meter:88}];
+  let qi=0, done=false;
+  const tickets=C.ht||10;
 
-  // flash ticket fly animation
-  flyTickets(tickets);
+  const badge=mkD('div','gc-badge','💖 Heart Key — Love Meter');
+  const title=mkD('div','gc-title','Read my heart…');
+  const desc=mkD('div','gc-desc','There are no wrong answers here.');
+  const rwd=mkD('div','gc-reward',`🎟️ +${tickets} tickets`);
+  const qEl=mkD('p','love-q','');
+  const mWrap=mkD('div','meter-wrap');
+  const mBg=mkD('div','meter-bg'); const mFill=mkD('div','meter-fill');
+  const mLbl=mkD('div','meter-lbl','');
+  mBg.appendChild(mFill); mWrap.append(mBg,mLbl); mWrap.style.display='none';
+  const optsEl=mkD('div','opts');
+  card.append(badge,title,desc,rwd,qEl,mWrap,optsEl);
+  setTimeout(()=>rwd.classList.add('show'),300);
 
-  if (state.keysUnlocked >= 3) {
-    setTimeout(() => showPrize(), 900);
-  } else {
-    setTimeout(() => {
-      updateKeyProgress();
-      renderActiveKey();
-    }, 700);
+  function loadQ(){
+    if(qi>=qs.length){ earn(tickets,'Heart: Love Meter'); nextGame(); return; }
+    const q=qs[qi]; qEl.textContent=q.q; optsEl.innerHTML=''; mWrap.style.display='none'; mFill.style.width='0%'; done=false;
+    q.opts.forEach((o,i)=>{
+      const b=mkD('button','opt',o); const isOk=i===q.correct;
+      b.onclick=()=>{ if(done) return; done=true;
+        optsEl.querySelectorAll('.opt').forEach(x=>{x.disabled=true;x.style.opacity='.42';}); b.style.opacity='1'; b.classList.add('correct');
+        mWrap.style.display='block';
+        const pct=isOk?(q.meter||88):Math.floor(Math.random()*30+45);
+        setTimeout(()=>{ mFill.style.width=pct+'%'; mLbl.textContent=`Accuracy: ${pct}% ❤️`; },120);
+        const react=mkD('div','meter-react',isOk?`Exactly… ${pct}% 💖`:'Still… I love this answer 🥺'); card.appendChild(react);
+        setTimeout(()=>{ qi++; loadQ(); },2300);
+      };
+      optsEl.appendChild(b);
+    });
   }
+  loadQ();
 }
 
-function addTickets(n, label) {
-  state.tickets += n;
-  state.history.push({ label, amount: n, date: new Date().toLocaleDateString() });
-  saveState(state);
-  renderWalletDisplay();
+// ── GAME 2: THIS OR THAT ────────────
+function gThisOrThat(card){
+  const pairs=C.totPairs?.length?C.totPairs:[{a:'Morning texts',b:'Late night calls',ans:'B'},{a:'Cuddles',b:'Kisses',ans:'A'}];
+  let pi=0;
+  const tickets=C.ht||10;
+
+  const badge=mkD('div','gc-badge','💖 Heart Key — This or That');
+  const title=mkD('div','gc-title','Pick one… no pressure 😏');
+  const rwd=mkD('div','gc-reward',`🎟️ +${tickets} tickets`);
+  const ctr=mkD('div','tot-ctr','');
+  const totWrap=mkD('div','tot-wrap');
+  const reactEl=mkD('div','tot-react',''); reactEl.style.display='none';
+  card.append(badge,title,rwd,ctr,totWrap,reactEl);
+  setTimeout(()=>rwd.classList.add('show'),300);
+
+  function loadPair(){
+    if(pi>=pairs.length){ earn(tickets,'Heart: This or That'); nextGame(); return; }
+    const p=pairs[pi]; ctr.textContent=`${pi+1} of ${pairs.length}`; totWrap.innerHTML=''; reactEl.style.display='none';
+    ['a','b'].forEach(side=>{
+      const btn=mkD('button','tot-btn',p[side]);
+      btn.onclick=()=>{
+        const mine=side.toUpperCase()===p.ans?.toUpperCase();
+        totWrap.querySelectorAll('.tot-btn').forEach(b=>{b.disabled=true;b.style.opacity='.4';});
+        btn.style.opacity='1'; if(mine) btn.classList.add('yours');
+        reactEl.style.display='block';
+        reactEl.textContent=mine?`Mine too 😏💖`:`I chose ${p.ans==='A'?p.a:p.b}… but I love your answer 🥺`;
+        setTimeout(()=>{ pi++; loadPair(); },1700);
+      };
+      totWrap.appendChild(btn);
+    });
+  }
+  loadPair();
 }
 
-function renderWalletDisplay() {
-  state = getState();
-  document.getElementById('wallet-display').textContent = state.tickets;
-  if (document.getElementById('prize-wallet-num'))
-    document.getElementById('prize-wallet-num').textContent = state.tickets;
+// ════════════════════════════════════
+// TRUST KEY — DARE
+// ════════════════════════════════════
+function trustGame(card){
+  const d=C.dare||'Say my name 5 times 😏\nSmile right now… I know you are 😂\nSend me a voice note 🎧';
+  const tickets=C.tt||10;
+  const badge=mkD('div','gc-badge','😏 Trust Key — Dare');
+  const title=mkD('div','gc-title','One last thing…');
+  const rwd=mkD('div','gc-reward',`🎟️ +${tickets} tickets`);
+  const dbox=mkD('div','dare-box',''); dbox.innerHTML=d.split('\n').join('<br/>');
+  const desc=mkD('div','gc-desc',"Once you've done it… tap below 💙");
+  const btn=mkD('button','gc-btn','Done 😏 ✓');
+  btn.onclick=()=>{ btn.disabled=true; earn(tickets,'Trust Key');
+    const rl=mkD('div','result-line','I knew you would… 😏💖'); rl.style.color='var(--b5)'; card.appendChild(rl);
+    setTimeout(()=>keyDone(),1600);
+  };
+  card.append(badge,title,rwd,dbox,desc,btn);
+  setTimeout(()=>rwd.classList.add('show'),300);
 }
 
-function flyTickets(n) {
-  const el = document.createElement('div');
-  el.className = 'ticket-fly';
-  el.textContent = '🎟️ +' + n;
-  el.style.left  = (window.innerWidth / 2 - 30) + 'px';
-  el.style.top   = (window.innerHeight / 2) + 'px';
-  document.body.appendChild(el);
-  setTimeout(() => el.remove(), 1300);
-}
-
-// ══════════════════════════════════════════
+// ════════════════════════════════════
 // PRIZE ROOM
-// ══════════════════════════════════════════
-function renderPrizeGrid() {
-  const grid = document.getElementById('prize-grid');
-  grid.innerHTML = '';
-  const disc = cfg.discount ? 0.5 : 1;
-
-  // Big goal card
-  if (cfg.goalName) {
-    const goal = document.createElement('div');
-    goal.className = 'prize-item';
-    goal.style.borderColor = 'rgba(55,138,221,0.35)';
-    goal.style.gridColumn = '1 / -1';
-    goal.innerHTML = `
-      <div class="prize-limited">🎯 Big Goal</div>
-      <span class="prize-emoji">🌟</span>
-      <div class="prize-name">${cfg.goalName}</div>
-      <div class="prize-cost">🎟️ ${Math.ceil((cfg.goalTickets||100) * disc)} tickets</div>
-    `;
-    goal.onclick = () => claimPrize(-1, Math.ceil((cfg.goalTickets||100)*disc), cfg.goalName, goal);
-    grid.appendChild(goal);
-  }
-
-  (cfg.prizes || []).forEach((p, i) => {
-    const item = document.createElement('div');
-    item.className = 'prize-item' + (p.enabled ? '' : ' disabled');
-    const cost = Math.ceil(p.cost * disc);
-    const claimed = state.claimedPrizes.includes(i);
-    if (claimed) item.classList.add('claimed');
-    item.innerHTML = `
-      ${p.limited ? `<div class="prize-limited">⏳ ${p.limited}</div>` : ''}
-      <span class="prize-emoji">${p.emoji}</span>
-      <div class="prize-name">${p.name}</div>
-      <div class="prize-cost">🎟️ ${cost} tickets</div>
-      <div class="prize-claimed">✓ claimed</div>
-    `;
-    item.onclick = () => claimPrize(i, cost, p.name, item);
-    grid.appendChild(item);
+// ════════════════════════════════════
+function renderPrizes(){
+  const g=document.getElementById('prize-grid'); g.innerHTML='';
+  const disc=C.disc?.5:1;
+  if(C.goal){ const item=mkD('div','prize-item'); item.style.cssText='border-color:rgba(55,138,221,.35);grid-column:1/-1;';
+    item.innerHTML=`<span class="p-emoji">🌟</span><div class="p-name">${C.goal}</div><div class="p-cost">🎟️ ${Math.ceil((C.goalT||100)*disc)}</div><div class="p-claimed">✓ claimed</div>`;
+    item.onclick=()=>claimPrize(-1,Math.ceil((C.goalT||100)*disc),C.goal,item); g.appendChild(item); }
+  (C.prizes||[]).forEach((p,i)=>{
+    const item=mkD('div','prize-item'+(p.on?'':' disabled')+(S.claimed.includes(i)?' claimed':''));
+    const cost=Math.ceil(p.c*disc);
+    item.innerHTML=`<span class="p-emoji">${p.e}</span><div class="p-name">${p.n}</div><div class="p-cost">🎟️ ${cost}</div><div class="p-claimed">✓ claimed</div>`;
+    item.onclick=()=>claimPrize(i,cost,p.n,item); g.appendChild(item);
   });
 }
-
-function claimPrize(idx, cost, name, el) {
-  if (state.tickets < cost) {
-    showToast('Not enough tickets… yet 😏');
-    return;
-  }
-  state.tickets -= cost;
-  if (idx >= 0) state.claimedPrizes.push(idx);
-  state.history.push({ label: 'Spent: ' + name, amount: -cost, date: new Date().toLocaleDateString() });
-  saveState(state);
-  renderWalletDisplay();
-  el.classList.add('claimed');
-  showToast('✓ ' + name + ' claimed 💖');
-  flyTickets(-cost);
-  if (document.getElementById('prize-wallet-num'))
-    document.getElementById('prize-wallet-num').textContent = state.tickets;
+function claimPrize(i,cost,name,el){
+  if(S.tickets<cost){ toast('Not enough tickets yet 😏'); return; }
+  S.tickets-=cost; if(i>=0) S.claimed.push(i);
+  S.hist.push({l:'Spent: '+name,a:-cost,d:new Date().toLocaleDateString()});
+  sS(S); wDisplay(); el.classList.add('claimed'); fly(-cost);
+  document.getElementById('prize-w').textContent=S.tickets;
+  toast('✓ '+name+' claimed 💖');
 }
 
-function showToast(msg) {
-  const t = document.createElement('div');
-  t.style.cssText = `position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:rgba(10,30,74,0.95);border:1px solid rgba(55,138,221,0.35);border-radius:50px;padding:10px 22px;font-size:0.8rem;color:var(--b6);z-index:300;animation:fadeUp 0.3s ease both`;
-  t.textContent = msg;
-  document.body.appendChild(t);
-  setTimeout(() => t.remove(), 2400);
-}
-
-// ══════════════════════════════════════════
-// WALLET MODAL
-// ══════════════════════════════════════════
-function openWallet() {
-  state = getState();
-  document.getElementById('wallet-modal-amount').textContent = state.tickets;
-  const hist = document.getElementById('wallet-history');
-  hist.innerHTML = '';
-  [...state.history].reverse().forEach(h => {
-    const row = document.createElement('div');
-    row.className = 'wallet-entry';
-    row.innerHTML = `<span>${h.label} <span style="font-size:0.65rem;color:var(--muted)">${h.date}</span></span><span class="we-amt">${h.amount > 0 ? '+':''} ${h.amount} 🎟️</span>`;
-    hist.appendChild(row);
-  });
+// ════════════════════════════════════
+// WALLET
+// ════════════════════════════════════
+function openWallet(){
+  S=gS(); document.getElementById('w-modal-amt').textContent=S.tickets;
+  const h=document.getElementById('w-hist'); h.innerHTML='';
+  [...S.hist].reverse().forEach(e=>{ const r=mkD('div','w-row');
+    r.innerHTML=`<span>${e.l} <span style="font-size:.6rem;color:var(--muted)">${e.d}</span></span><span class="wa">${e.a>0?'+':''}${e.a} 🎟️</span>`;
+    h.appendChild(r); });
   document.getElementById('wallet-modal').classList.add('show');
 }
-function closeWallet() { document.getElementById('wallet-modal').classList.remove('show'); }
+function closeWallet(){ document.getElementById('wallet-modal').classList.remove('show'); }
 
-// ══════════════════════════════════════════
-// HUG SYSTEM
-// ══════════════════════════════════════════
-let hugHoldTimer = null, hugProgress = 0, hugInterval = null;
-const hugBtn = document.getElementById('hug-btn');
-
-function openHug() {
-  hugProgress = 0;
-  document.getElementById('hug-ring-fill').style.strokeDashoffset = '220';
-  document.getElementById('hug-emoji').textContent = '🤗';
-  document.getElementById('hug-modal-title').textContent = 'Hold for a hug… 🥺';
-  document.getElementById('hug-modal-sub').style.display = '';
-  document.getElementById('hug-modal-sub').textContent = 'keep holding…';
-  document.getElementById('hug-msg').style.display = 'none';
+// ════════════════════════════════════
+// HUG
+// ════════════════════════════════════
+let hugIv=null;
+const hugBtn=document.getElementById('hug-btn');
+function openHug(){
+  document.getElementById('hug-fill').style.strokeDashoffset='220';
+  document.getElementById('hug-emoji').textContent='🤗';
+  document.getElementById('hug-ring-wrap').style.display='';
+  document.getElementById('hug-title').textContent='Hold for a hug… 🥺';
+  document.getElementById('hug-sub').style.display='';
+  document.getElementById('hug-msg').style.display='none';
   document.getElementById('hug-overlay').classList.add('show');
 }
-function closeHug() {
-  clearInterval(hugInterval);
-  document.getElementById('hug-overlay').classList.remove('show');
-}
-
-hugBtn.addEventListener('mousedown',  startHugHold);
-hugBtn.addEventListener('touchstart', startHugHold, { passive:true });
-hugBtn.addEventListener('mouseup',    stopHugHold);
-hugBtn.addEventListener('touchend',   stopHugHold);
-hugBtn.addEventListener('click',      openHug);
-
-function startHugHold(e) {
-  openHug();
-  hugProgress = 0;
-  clearInterval(hugInterval);
-  hugInterval = setInterval(() => {
-    hugProgress += 2; // 0→100 over 5s (100ms tick × 50 = 5000ms)
-    const offset = 220 - (220 * hugProgress / 100);
-    document.getElementById('hug-ring-fill').style.strokeDashoffset = offset;
-    if (hugProgress >= 100) {
-      clearInterval(hugInterval);
-      // UNLOCK
-      document.getElementById('hug-emoji').textContent = '💙';
-      document.getElementById('hug-ring-wrap').style.display = 'none';
-      document.getElementById('hug-modal-title').textContent = 'Holding you…';
-      document.getElementById('hug-modal-sub').style.display = 'none';
-      document.getElementById('hug-msg').style.display = 'block';
-      document.getElementById('hug-msg').textContent = cfg.hugMsg || defaultConfig().hugMsg;
-    }
-  }, 100);
-}
-function stopHugHold() { clearInterval(hugInterval); }
-
-// ══════════════════════════════════════════
-// ADMIN
-// ══════════════════════════════════════════
-let adminTapCount = 0, adminTapTimer = null;
-document.getElementById('nav-logo').addEventListener('click', () => {
-  adminTapCount++;
-  clearTimeout(adminTapTimer);
-  adminTapTimer = setTimeout(() => adminTapCount = 0, 1800);
-  if (adminTapCount >= 5) { adminTapCount = 0; openAdminGate(); }
-});
-
-function openAdminGate() {
-  document.getElementById('admin-gate').classList.add('show');
-  document.getElementById('admin-pw').value = '';
-  document.getElementById('admin-err').textContent = '';
-  setTimeout(() => document.getElementById('admin-pw').focus(), 80);
-}
-function closeAdminGate() { document.getElementById('admin-gate').classList.remove('show'); }
-document.getElementById('admin-pw').addEventListener('keydown', e => { if (e.key === 'Enter') tryAdmin(); });
-
-function tryAdmin() {
-  if (document.getElementById('admin-pw').value === ADMIN_PASS) {
-    closeAdminGate();
-    openAdminPanel();
-  } else {
-    document.getElementById('admin-err').textContent = 'wrong password ✗';
-    document.getElementById('admin-pw').value = '';
+function closeHug(){ clearInterval(hugIv); document.getElementById('hug-overlay').classList.remove('show'); }
+hugBtn.addEventListener('click',openHug);
+hugBtn.addEventListener('mousedown',sHugHold); hugBtn.addEventListener('touchstart',sHugHold,{passive:true});
+hugBtn.addEventListener('mouseup',eHugHold); hugBtn.addEventListener('touchend',eHugHold);
+function sHugHold(){ let p=0; clearInterval(hugIv); hugIv=setInterval(()=>{
+  p+=2; document.getElementById('hug-fill').style.strokeDashoffset=220-(220*p/100);
+  if(p>=100){ clearInterval(hugIv);
+    document.getElementById('hug-emoji').textContent='💙';
+    document.getElementById('hug-ring-wrap').style.display='none';
+    document.getElementById('hug-title').textContent='Holding you…';
+    document.getElementById('hug-sub').style.display='none';
+    const m=document.getElementById('hug-msg'); m.style.display='block'; m.textContent=C.hugMsg||dCfg().hugMsg;
   }
-}
+},100); }
+function eHugHold(){ clearInterval(hugIv); }
 
-function openAdminPanel() {
-  cfg = getConfig();
-  document.getElementById('ap-game-active').checked = !!cfg.gameActive;
-  document.getElementById('ap-bonus-mode').checked  = !!cfg.bonusMode;
-  document.getElementById('ap-discount').checked    = !!cfg.discount;
-  document.getElementById('ap-hug-msg').value       = cfg.hugMsg || '';
-  document.getElementById('ap-goal-name').value     = cfg.goalName || '';
-  document.getElementById('ap-goal-tickets').value  = cfg.goalTickets || 100;
+// ════════════════════════════════════
+// ADMIN
+// ════════════════════════════════════
+let tapN=0, tapT=null;
+document.getElementById('nav-logo').addEventListener('click',()=>{
+  tapN++; clearTimeout(tapT); tapT=setTimeout(()=>tapN=0,1800);
+  if(tapN>=5){ tapN=0; openAdminGate(); }
+});
+function openAdminGate(){ document.getElementById('admin-gate').classList.add('show'); document.getElementById('adm-pw').value=''; document.getElementById('adm-err').textContent=''; setTimeout(()=>document.getElementById('adm-pw').focus(),80); }
+function closeAdminGate(){ document.getElementById('admin-gate').classList.remove('show'); }
+document.getElementById('adm-pw').addEventListener('keydown',e=>{ if(e.key==='Enter') tryAdmin(); });
+function tryAdmin(){ if(document.getElementById('adm-pw').value===PASS){ closeAdminGate(); openAdmin(); } else { document.getElementById('adm-err').textContent='wrong ✗'; document.getElementById('adm-pw').value=''; } }
 
-  const k = cfg.keys || [];
-  // Key 1
-  document.getElementById('ap-k1-title').value    = k[0]?.title    || '';
-  document.getElementById('ap-k1-imgurl').value   = k[0]?.imgUrl   || '';
-  document.getElementById('ap-k1-question').value = k[0]?.question || '';
-  document.getElementById('ap-k1-options').value  = (k[0]?.options || []).join('\n');
-  document.getElementById('ap-k1-tickets').value  = k[0]?.tickets  || 10;
-  // Key 2
-  document.getElementById('ap-k2-title').value    = k[1]?.title    || '';
-  document.getElementById('ap-k2-question').value = k[1]?.question || '';
-  document.getElementById('ap-k2-options').value  = (k[1]?.options || []).join('\n');
-  document.getElementById('ap-k2-tickets').value  = k[1]?.tickets  || 10;
-  // Key 3
-  document.getElementById('ap-k3-title').value    = k[2]?.title    || '';
-  document.getElementById('ap-k3-dare').value     = k[2]?.dare     || '';
-  document.getElementById('ap-k3-tickets').value  = k[2]?.tickets  || 10;
-
+function openAdmin(){
+  C=gC();
+  document.getElementById('ap-active').checked=!!C.active;
+  document.getElementById('ap-bonus').checked=!!C.bonus;
+  document.getElementById('ap-disc').checked=!!C.disc;
+  document.getElementById('ap-blur').value=(C.blurImgs||[]).join(', ');
+  document.getElementById('ap-hint-cost').value=C.hintCost||2;
+  document.getElementById('ap-emoji').value=(C.emojiSeqs||[]).map(s=>`${s.emoji}|${s.caption}|${s.opts.join('|')}|${s.correct}`).join('\n');
+  document.getElementById('ap-puzzle').value=C.puzzleImg||'';
+  const chatRaw=(C.chatLines||[]).join('\n')+'---\n'+(C.chatOpts||[]).map((o,i)=>(i===C.chatCorrect?'✓ ':'')+o).join('\n');
+  document.getElementById('ap-chat').value=chatRaw;
+  document.getElementById('ap-chat-react').value=C.chatReact||'';
+  document.getElementById('ap-sound-url').value=C.soundUrl||'';
+  document.getElementById('ap-sound-q').value=C.soundQ||'';
+  document.getElementById('ap-sound-opts').value=(C.soundOpts||[]).map((o,i)=>(i===C.soundCorrect?'✓ ':'')+o).join('\n');
+  document.getElementById('ap-love').value=(C.loveQs||[]).map(q=>`${q.q}|${q.opts.join('|')}|${q.correct}|${q.meter}`).join('\n');
+  document.getElementById('ap-tot').value=(C.totPairs||[]).map(p=>`${p.a}|${p.b}|${p.ans}`).join('\n');
+  document.getElementById('ap-dare').value=C.dare||'';
+  document.getElementById('ap-mt').value=C.mt||10; document.getElementById('ap-ht').value=C.ht||10;
+  document.getElementById('ap-tt').value=C.tt||10; document.getElementById('ap-eb').value=C.eb||5; document.getElementById('ap-rb').value=C.rb||5;
+  document.getElementById('ap-goal').value=C.goal||''; document.getElementById('ap-goal-t').value=C.goalT||100;
+  document.getElementById('ap-hug').value=C.hugMsg||'';
   renderAdminPrizes();
   document.getElementById('admin-panel').classList.add('show');
 }
+function closeAdminPanel(){ document.getElementById('admin-panel').classList.remove('show'); C=gC(); renderPage(); }
 
-function closeAdminPanel() {
-  document.getElementById('admin-panel').classList.remove('show');
-  cfg = getConfig();
-  renderPage();
-}
-
-function adminSave() {
-  const c = {
-    gameActive: document.getElementById('ap-game-active').checked,
-    bonusMode:  document.getElementById('ap-bonus-mode').checked,
-    discount:   document.getElementById('ap-discount').checked,
-    hugMsg:     document.getElementById('ap-hug-msg').value,
-    goalName:   document.getElementById('ap-goal-name').value,
-    goalTickets:parseInt(document.getElementById('ap-goal-tickets').value) || 100,
-    keys: [
-      {
-        title:    document.getElementById('ap-k1-title').value,
-        imgUrl:   document.getElementById('ap-k1-imgurl').value,
-        question: document.getElementById('ap-k1-question').value,
-        options:  document.getElementById('ap-k1-options').value.split('\n').filter(Boolean),
-        tickets:  parseInt(document.getElementById('ap-k1-tickets').value) || 10,
-      },
-      {
-        title:    document.getElementById('ap-k2-title').value,
-        question: document.getElementById('ap-k2-question').value,
-        options:  document.getElementById('ap-k2-options').value.split('\n').filter(Boolean),
-        tickets:  parseInt(document.getElementById('ap-k2-tickets').value) || 10,
-      },
-      {
-        title:    document.getElementById('ap-k3-title').value,
-        dare:     document.getElementById('ap-k3-dare').value,
-        tickets:  parseInt(document.getElementById('ap-k3-tickets').value) || 10,
-      },
-    ],
-    prizes: collectPrizes(),
+function aSave(){
+  const blurImgs=document.getElementById('ap-blur').value.split(',').map(s=>s.trim()).filter(Boolean);
+  const emojiSeqs=document.getElementById('ap-emoji').value.split('\n').filter(Boolean).map(l=>{ const p=l.split('|'); return {emoji:p[0],caption:p[1],opts:p.slice(2,-1),correct:parseInt(p[p.length-1])||0}; });
+  const chatRaw=document.getElementById('ap-chat').value, cp=chatRaw.split('---');
+  const chatLines=(cp[0]||'').trim().split('\n').filter(Boolean);
+  const chatOptRaw=(cp[1]||'').trim().split('\n').filter(Boolean);
+  const chatOpts=chatOptRaw.map(o=>o.replace(/^✓\s*/,'')), chatCorrect=chatOptRaw.findIndex(o=>o.startsWith('✓'));
+  const sOptRaw=document.getElementById('ap-sound-opts').value.split('\n').filter(Boolean);
+  const soundOpts=sOptRaw.map(o=>o.replace(/^✓\s*/,'')), soundCorrect=sOptRaw.findIndex(o=>o.startsWith('✓'));
+  const loveQs=document.getElementById('ap-love').value.split('\n').filter(Boolean).map(l=>{ const p=l.split('|'); return {q:p[0],opts:p.slice(1,-2),correct:parseInt(p[p.length-2])||0,meter:parseInt(p[p.length-1])||80}; });
+  const totPairs=document.getElementById('ap-tot').value.split('\n').filter(Boolean).map(l=>{ const p=l.split('|'); return {a:p[0],b:p[1],ans:p[2]||'A'}; });
+  C={
+    active:document.getElementById('ap-active').checked, bonus:document.getElementById('ap-bonus').checked, disc:document.getElementById('ap-disc').checked,
+    blurImgs, hintCost:parseInt(document.getElementById('ap-hint-cost').value)||2,
+    emojiSeqs, puzzleImg:document.getElementById('ap-puzzle').value,
+    chatLines, chatOpts, chatCorrect:chatCorrect<0?0:chatCorrect, chatReact:document.getElementById('ap-chat-react').value,
+    soundUrl:document.getElementById('ap-sound-url').value, soundQ:document.getElementById('ap-sound-q').value,
+    soundOpts, soundCorrect:soundCorrect<0?0:soundCorrect,
+    loveQs, totPairs, dare:document.getElementById('ap-dare').value,
+    mt:parseInt(document.getElementById('ap-mt').value)||10, ht:parseInt(document.getElementById('ap-ht').value)||10,
+    tt:parseInt(document.getElementById('ap-tt').value)||10, eb:parseInt(document.getElementById('ap-eb').value)||5, rb:parseInt(document.getElementById('ap-rb').value)||5,
+    prizes:C.prizes||dCfg().prizes,
+    goal:document.getElementById('ap-goal').value, goalT:parseInt(document.getElementById('ap-goal-t').value)||100,
+    hugMsg:document.getElementById('ap-hug').value,
   };
-  saveConfig(c);
-  cfg = c;
-  const ok = document.getElementById('ap-ok-all');
-  ok.textContent = '✓ saved!';
-  setTimeout(() => ok.textContent = '', 2000);
+  sC(C);
+  const ok=document.getElementById('ap-ok-all'); ok.textContent='✓ saved!'; setTimeout(()=>ok.textContent='',2000);
 }
+function aStart(){ aSave(); C.active=true; document.getElementById('ap-active').checked=true; sC(C); document.getElementById('ap-ok-ctrl').textContent='✓ Game started!'; setTimeout(()=>document.getElementById('ap-ok-ctrl').textContent='',2000); }
+function aReset(){ if(!confirm('Reset all player progress?')) return; sS(dSt()); S=dSt(); C.active=false; document.getElementById('ap-active').checked=false; sC(C); wDisplay(); document.getElementById('ap-ok-ctrl').textContent='✓ Reset done'; setTimeout(()=>document.getElementById('ap-ok-ctrl').textContent='',2000); }
+function giveBonus(){ const n=parseInt(document.getElementById('ap-bon-amt').value)||10; S=gS(); earn(n,'Bonus from Cedric 😏'); toast('🎟️ +'+n+' tickets added!'); }
 
-function adminStartGame() {
-  adminSave();
-  cfg.gameActive = true;
-  document.getElementById('ap-game-active').checked = true;
-  saveConfig(cfg);
-  document.getElementById('ap-ok-game').textContent = '✓ Game started!';
-  setTimeout(() => document.getElementById('ap-ok-game').textContent = '', 2000);
-}
-
-function adminResetGame() {
-  if (!confirm('Reset all progress and tickets? This cannot be undone.')) return;
-  saveState(defaultState());
-  state = defaultState();
-  cfg.gameActive = false;
-  document.getElementById('ap-game-active').checked = false;
-  saveConfig(cfg);
-  renderWalletDisplay();
-  document.getElementById('ap-ok-game').textContent = '✓ Reset done';
-  setTimeout(() => document.getElementById('ap-ok-game').textContent = '', 2000);
-}
-
-function giveBonus() {
-  const n = parseInt(document.getElementById('ap-bonus-amt').value) || 10;
-  state = getState();
-  addTickets(n, 'Bonus from Cedric 😏');
-  renderWalletDisplay();
-  flyTickets(n);
-  showToast('🎟️ +' + n + ' bonus tickets added!');
-}
-
-// Prize admin
-function renderAdminPrizes() {
-  const list = document.getElementById('ap-prize-list');
-  list.innerHTML = '';
-  (cfg.prizes || []).forEach((p, i) => {
-    const row = document.createElement('div');
-    row.className = 'ap-row-item';
-    row.dataset.idx = i;
-    row.innerHTML = `
-      <input type="text" class="ap-input" value="${p.emoji}" style="width:46px;margin-bottom:0;text-align:center" onchange="updatePrize(${i},'emoji',this.value)"/>
-      <input type="text" class="ap-input" value="${p.name}" style="flex:1;margin-bottom:0" onchange="updatePrize(${i},'name',this.value)"/>
-      <input type="number" class="ap-num" value="${p.cost}" style="margin-bottom:0" onchange="updatePrize(${i},'cost',+this.value)"/>
-      <label class="toggle-wrap" style="margin-bottom:0">
-        <input type="checkbox" ${p.enabled?'checked':''} onchange="updatePrize(${i},'enabled',this.checked)"/>
-        <span class="toggle-slider"></span>
-      </label>
-      <button onclick="removePrize(${i})" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:1rem">✕</button>
-    `;
+function renderAdminPrizes(){
+  const list=document.getElementById('ap-prizes'); list.innerHTML='';
+  (C.prizes||[]).forEach((p,i)=>{
+    const row=mkD('div','ap-pr-row');
+    row.innerHTML=`<input type="text" class="ap-inp" value="${p.e}" style="width:40px;margin:0;text-align:center" onchange="C.prizes[${i}].e=this.value;aSave()"/>
+    <input type="text" class="ap-inp" value="${p.n}" style="flex:1;margin:0" onchange="C.prizes[${i}].n=this.value;aSave()"/>
+    <input type="number" class="ap-num" value="${p.c}" style="width:62px" onchange="C.prizes[${i}].c=+this.value;aSave()"/>
+    <label class="tog"><input type="checkbox" ${p.on?'checked':''} onchange="C.prizes[${i}].on=this.checked;aSave()"/><span class="tog-sl"></span></label>
+    <button onclick="C.prizes.splice(${i},1);renderAdminPrizes();aSave()" style="background:none;border:none;color:var(--muted);cursor:pointer">✕</button>`;
     list.appendChild(row);
   });
 }
+function addPrize(){ C.prizes=C.prizes||[]; C.prizes.push({e:'🎁',n:'New Prize',c:10,on:true}); renderAdminPrizes(); aSave(); }
 
-function collectPrizes() {
-  return (cfg.prizes || []);
+// ════════════════════════════════════
+// HELPERS
+// ════════════════════════════════════
+function mkD(tag,cls,txt){
+  const el=document.createElement(tag==='p'?'p':tag==='button'?'button':'div');
+  if(cls) el.className=cls; if(txt!==undefined) el.textContent=txt; return el;
 }
-function updatePrize(i, key, val) {
-  cfg.prizes[i][key] = val;
-  adminSave();
-}
-function removePrize(i) {
-  cfg.prizes.splice(i, 1);
-  renderAdminPrizes();
-  adminSave();
-}
-function addPrize() {
-  cfg.prizes = cfg.prizes || [];
-  cfg.prizes.push({ emoji:'🎁', name:'New Prize', cost:10, enabled:true, limited:'' });
-  renderAdminPrizes();
-  adminSave();
-}
+function fly(n){ const el=document.createElement('div'); el.className='t-fly'; el.textContent=(n>0?'🎟️ +':'🎟️ ')+n; el.style.left=(window.innerWidth/2-30)+'px'; el.style.top=(window.innerHeight/2)+'px'; document.body.appendChild(el); setTimeout(()=>el.remove(),1200); }
+function toast(msg){ const t=document.createElement('div'); t.style.cssText='position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:rgba(10,30,74,.95);border:1px solid rgba(55,138,221,.35);border-radius:50px;padding:9px 20px;font-size:.77rem;color:var(--b6);z-index:300;animation:fadeUp .3s ease both;white-space:nowrap'; t.textContent=msg; document.body.appendChild(t); setTimeout(()=>t.remove(),2400); }
 
-// ══════════════════════════════════════════
+// ════════════════════════════════════
 // BG ANIMATIONS
-// ══════════════════════════════════════════
+// ════════════════════════════════════
 (function(){
-  const c = document.getElementById('stars'), ctx = c.getContext('2d');
-  let W, H, stars = [];
-  function resize(){ W = c.width = innerWidth; H = c.height = innerHeight; init(); }
-  function init(){ stars = []; for(let i=0;i<200;i++) stars.push({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.2+0.2,a:Math.random(),da:(Math.random()-0.5)*0.005}); }
-  function draw(){ ctx.clearRect(0,0,W,H); stars.forEach(s=>{ s.a+=s.da; if(s.a<=0.05||s.a>=1)s.da*=-1; ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fillStyle=`rgba(133,183,235,${s.a*0.6})`;ctx.fill(); }); requestAnimationFrame(draw); }
-  window.addEventListener('resize', resize); resize(); draw();
+  const c=document.getElementById('stars'),ctx=c.getContext('2d');
+  let W,H,st=[];
+  function resize(){W=c.width=innerWidth;H=c.height=innerHeight;st=[];for(let i=0;i<200;i++)st.push({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.2+.2,a:Math.random(),da:(Math.random()-.5)*.005});}
+  function draw(){ctx.clearRect(0,0,W,H);st.forEach(s=>{s.a+=s.da;if(s.a<=.05||s.a>=1)s.da*=-1;ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fillStyle=`rgba(133,183,235,${s.a*.6})`;ctx.fill();});requestAnimationFrame(draw);}
+  window.addEventListener('resize',resize);resize();draw();
 })();
 (function(){
-  const c = document.getElementById('glitter'), ctx = c.getContext('2d');
-  let W, H, p = [];
-  function resize(){ W = c.width = innerWidth; H = c.height = innerHeight; }
-  window.addEventListener('resize', resize); resize();
-  function spawn(){ p.push({x:Math.random()*W,y:H+8,vx:(Math.random()-0.5)*0.7,vy:-(Math.random()*0.9+0.35),r:Math.random()*2+0.4,life:Math.random()*110+80,age:0}); }
-  function draw(){ ctx.clearRect(0,0,W,H); if(Math.random()<0.28) spawn(); p=p.filter(g=>g.age<g.life); p.forEach(g=>{ g.x+=g.vx;g.y+=g.vy;g.age++; const a=1-g.age/g.life; ctx.beginPath();ctx.arc(g.x,g.y,g.r,0,Math.PI*2);ctx.fillStyle=`rgba(181,212,244,${a})`;ctx.fill(); }); requestAnimationFrame(draw); }
+  const c=document.getElementById('glitter'),ctx=c.getContext('2d');
+  let W,H,p=[];
+  function resize(){W=c.width=innerWidth;H=c.height=innerHeight;}
+  window.addEventListener('resize',resize);resize();
+  function spawn(){p.push({x:Math.random()*W,y:H+8,vx:(Math.random()-.5)*.7,vy:-(Math.random()*.9+.35),r:Math.random()*2+.4,life:Math.random()*110+80,age:0});}
+  function draw(){ctx.clearRect(0,0,W,H);if(Math.random()<.28)spawn();p=p.filter(g=>g.age<g.life);p.forEach(g=>{g.x+=g.vx;g.y+=g.vy;g.age++;const a=1-g.age/g.life;ctx.beginPath();ctx.arc(g.x,g.y,g.r,0,Math.PI*2);ctx.fillStyle=`rgba(181,212,244,${a})`;ctx.fill();});requestAnimationFrame(draw);}
   draw();
 })();
 </script>
