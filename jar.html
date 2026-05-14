@@ -270,6 +270,7 @@ audio{width:100%;accent-color:#b8860b}
 @keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
 @keyframes popIn{from{transform:scale(0)}to{transform:scale(1)}}
 @keyframes lockedFloat{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-8px) rotate(2deg)}}
+@keyframes emptyJarFloat{0%,100%{transform:translateY(0) rotate(-1deg);opacity:.9}50%{transform:translateY(-10px) rotate(1deg);opacity:1}}
 footer{position:relative;z-index:10;text-align:center;padding:36px 24px;border-top:1px solid rgba(55,138,221,.08)}
 footer p{font-family:'Cormorant Garamond',serif;font-size:1rem;font-style:italic;font-weight:300;color:var(--muted);line-height:2}
 .hb{display:inline-block;animation:hb 1.5s ease infinite;color:var(--b5)}
@@ -293,6 +294,7 @@ footer p{font-family:'Cormorant Garamond',serif;font-size:1rem;font-style:italic
 </nav>
 
 <!-- HISTORY ICON (top right, below nav) -->
+<button class="history-icon-btn" style="right:auto;left:16px" onclick="openMsgHistory()">📜 Message History</button>
 <button class="history-icon-btn" onclick="openHistory()">🎁 Gift History</button>
 
 <main>
@@ -499,10 +501,37 @@ footer p{font-family:'Cormorant Garamond',serif;font-size:1rem;font-style:italic
 
 <!-- ══ COMPLETION ══ -->
 <div id="completion-screen">
-  <div class="comp-emoji">🫙</div>
-  <p class="comp-title">You opened every piece of me… 😏</p>
-  <p class="comp-sub">Now pick your reward ❤️</p>
-  <button class="btn-comp" onclick="openLoveMenu()">Open Love Menu 🍽️</button>
+  <!-- EMPTY JAR SVG -->
+  <div style="position:relative;margin-bottom:24px;animation:emptyJarFloat 3s ease-in-out infinite">
+    <svg viewBox="0 0 160 200" width="140" height="175" xmlns="http://www.w3.org/2000/svg" style="filter:drop-shadow(0 0 20px rgba(55,138,221,.3))">
+      <!-- cork slightly askew = empty/used -->
+      <rect x="52" y="32" width="56" height="30" rx="8" fill="#8a5c1a" opacity=".6" transform="rotate(6,80,47)"/>
+      <ellipse cx="82" cy="32" rx="28" ry="7" fill="#a07030" opacity=".6"/>
+      <!-- jar body outline only — empty inside -->
+      <path d="M42 75 Q30 82 28 108 L22 168 Q21 184 80 185 Q139 184 138 168 L132 108 Q130 82 118 75 Z"
+            fill="rgba(10,30,74,.25)" stroke="rgba(100,170,255,.35)" stroke-width="1.5"/>
+      <!-- neck -->
+      <path d="M52 64 L48 75 L112 75 L108 64 Z" fill="rgba(10,30,74,.3)" stroke="rgba(100,170,255,.25)" stroke-width="1"/>
+      <!-- just a few leftover sparkles drifting out -->
+      <circle cx="68" cy="130" r="1.2" fill="rgba(100,180,255,.4)" opacity=".5"/>
+      <circle cx="92" cy="148" r=".9" fill="rgba(100,180,255,.35)" opacity=".4"/>
+      <circle cx="76" cy="160" r=".7" fill="rgba(100,180,255,.3)" opacity=".3"/>
+      <!-- glass shine -->
+      <path d="M42 78 Q34 98 33 135 L34 172" fill="none" stroke="rgba(255,255,255,.15)" stroke-width="6" stroke-linecap="round"/>
+    </svg>
+    <!-- crack line on jar -->
+    <svg style="position:absolute;top:70px;left:50px" width="60" height="80" viewBox="0 0 60 80">
+      <path d="M20 0 L26 18 L18 22 L28 44 L22 48 L30 70" fill="none" stroke="rgba(100,170,255,.3)" stroke-width="1.2" stroke-linecap="round"/>
+    </svg>
+  </div>
+  <p class="comp-title" style="font-size:clamp(1.2rem,4vw,2rem)">You opened every piece of me… 💙</p>
+  <p class="comp-sub" style="max-width:380px;line-height:1.85">
+    The jar is empty now… but that just means<br/>
+    <em style="color:var(--b5)">I get to fill it with love again, just for you.</em><br/>
+    <span style="font-size:.85rem;opacity:.6">Wait a little while… it's being refilled ✨</span>
+  </p>
+  <button class="btn-comp" onclick="openLoveMenu()" style="margin-bottom:14px">Pick your reward 🍽️</button>
+  <p style="font-family:'Cormorant Garamond',serif;font-size:.88rem;font-style:italic;color:rgba(181,212,244,.3);cursor:pointer" onclick="closeCompletion()">→ stay on jar page</p>
 </div>
 
 <!-- ══ LOVE MENU ══ -->
@@ -537,6 +566,18 @@ footer p{font-family:'Cormorant Garamond',serif;font-size:1rem;font-style:italic
 </div>
 
 <footer><p>Made with everything I have, for you 💙<br/>I love you Mirakiii <span class="hb">✨</span></p></footer>
+
+<!-- MSG HISTORY PANEL -->
+<div id="msg-history-panel" style="display:none;position:fixed;inset:0;z-index:860;background:rgba(4,14,36,.97);backdrop-filter:blur(20px);overflow-y:auto">
+  <div style="max-width:580px;margin:0 auto;padding:80px 24px 60px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:28px;flex-wrap:wrap;gap:12px">
+      <p style="font-family:'Playfair Display',serif;font-size:1.4rem;color:#fff;font-style:italic">📜 Message History</p>
+      <button class="btn-hist-close" onclick="document.getElementById('msg-history-panel').style.display='none'">✕ Close</button>
+    </div>
+    <p style="font-size:.78rem;color:var(--muted);font-style:italic;margin-bottom:24px;line-height:1.6">Every jar that was filled with love — so you never repeat the same words twice 💙</p>
+    <div id="msg-hist-list"></div>
+  </div>
+</div>
 
 <!-- ADMIN GATE -->
 <div id="admin-gate" style="display:none;align-items:center;justify-content:center;">
@@ -965,7 +1006,8 @@ function recordOpen(cat){
   hist[key].msgs++;
   if(!hist[key].cats.includes(cat))hist[key].cats.push(cat);
   sd('jar_history',hist);
-  const newCount = (getOpenedCount()||0)+1;
+  const total = getTotalMsgs();
+  const newCount = Math.min((getOpenedCount()||0)+1, total > 0 ? total : 99999);
   sd('jar_opened_count', newCount);
 }
 function recordGiftClaim(food){
@@ -990,14 +1032,53 @@ updateProgress();
 function checkCompletion(){
   const total=getTotalMsgs(),opened=getOpenedCount();
   if(total>0&&opened>=total){
-    // Mark jar as completed — will show broken/locked state
     sd('jar_completed',true);
+    // Archive all current messages BEFORE deleting
+    archiveCurrentJar();
+    // Delete all messages so jar is empty
+    clearAllMessages();
     setTimeout(()=>{
       document.getElementById('letter-screen').classList.remove('show');
       glitterBurst();
-      setTimeout(()=>document.getElementById('completion-screen').classList.add('show'),700);
+      setTimeout(()=>{
+        document.getElementById('completion-screen').classList.add('show');
+        // Show broken/empty jar
+        renderLockedJarState(true);
+      },700);
     },2000);
   }
+}
+
+function archiveCurrentJar(){
+  // Save snapshot of all current messages to archive
+  const archive = gd('jar_msg_archive',[]);
+  const msgs = getMsgs();
+  const mems = getMems();
+  const photos = getPhotos();
+  const jarNum = archive.length + 1;
+  const date = new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+  const snapshot = {
+    jarNum,
+    date,
+    msgs: JSON.parse(JSON.stringify(msgs)), // deep copy
+    mems: [...mems],
+    photoCount: photos.length,
+    totalCount: getTotalMsgs(),
+  };
+  archive.push(snapshot);
+  sd('jar_msg_archive', archive);
+}
+
+function clearAllMessages(){
+  // Save empty state for all categories
+  const empty = {sad:[],missyou:[],smile:[],memory:[],motivation:[],cuteness:[]};
+  sd('jar_msgs', empty);
+  sd('jar_mems', []);
+  // Reset pool caches
+  Object.keys(catPools).forEach(k=>delete catPools[k]);
+  sd('jar_opened_count',0);
+  updateProgress();
+  renderList();
 }
 
 function isJarCompleted(){ return gd('jar_completed',false); }
@@ -1293,12 +1374,98 @@ if(isJarCompleted()){
     sd('jar_completed',false);
   }
 } else {
-  // Also guard against over-count bug (22/21 case)
+  // Guard against over-count bug (e.g. 22/21 case)
   const total=getTotalMsgs(),opened=getOpenedCount();
   if(total>0 && opened>total){
     sd('jar_opened_count',total);
     updateProgress();
   }
+}
+
+// ── ALSO: if jar was completed and messages are already cleared, show locked ──
+if(isJarCompleted()){
+  const t=getTotalMsgs(),o=getOpenedCount();
+  if(t===0||o>=t){
+    setTimeout(()=>renderLockedJarState(true),200);
+  }
+}
+
+// ── MESSAGE HISTORY ──
+function openMsgHistory(){
+  document.getElementById('msg-history-panel').style.display='block';
+  renderMsgHistoryPanel();
+}
+
+function renderMsgHistoryPanel(){
+  const list = document.getElementById('msg-hist-list');
+  const archive = gd('jar_msg_archive',[]);
+  if(!archive.length){
+    list.innerHTML='<p style="font-size:.85rem;color:var(--muted);font-style:italic;padding:16px 0;text-align:center">No completed jars yet.<br/>When you finish opening all messages, they'll be saved here 💙</p>';
+    return;
+  }
+  list.innerHTML='';
+  // Newest first
+  [...archive].reverse().forEach((jar,ri)=>{
+    const wrapper = document.createElement('div');
+    wrapper.style.cssText='margin-bottom:20px;background:rgba(255,255,255,.04);border:1px solid rgba(55,138,221,.15);border-radius:18px;overflow:hidden';
+    // Header — clickable to expand
+    const header = document.createElement('div');
+    header.style.cssText='padding:16px 20px;display:flex;justify-content:space-between;align-items:center;cursor:pointer';
+    const isOpen = ri===0; // auto-open latest
+    header.innerHTML=`
+      <div>
+        <div style="font-family:'Playfair Display',serif;font-size:1rem;font-style:italic;color:var(--b6)">🫙 Jar #${jar.jarNum}</div>
+        <div style="font-size:.7rem;color:var(--muted);margin-top:2px">${jar.date} · ${jar.totalCount} messages</div>
+      </div>
+      <span style="font-size:.75rem;color:var(--b4);transition:transform .3s" class="jar-arrow">${isOpen?'▲':'▼'}</span>
+    `;
+    // Body — expandable
+    const body = document.createElement('div');
+    body.style.cssText=`padding:0 20px ${isOpen?'20px':'0'};display:${isOpen?'block':'none'}`;
+    // Build message list
+    const catLabels={sad:'😔 Sad',missyou:'❤️ Miss you',smile:'😊 Smile',memory:'📸 Memory',motivation:'🔥 Motivation',cuteness:'😍 Cuteness'};
+    let bodyHtml='<div style="border-top:1px solid rgba(55,138,221,.1);padding-top:16px">';
+    let hasAny=false;
+    if(jar.msgs){
+      Object.entries(jar.msgs).forEach(([cat,msgs])=>{
+        if(!msgs||!msgs.length)return;
+        hasAny=true;
+        bodyHtml+=`<div style="margin-bottom:14px"><p style="font-size:.62rem;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--b4);opacity:.8;margin-bottom:8px">${catLabels[cat]||cat}</p>`;
+        msgs.forEach((m,i)=>{
+          bodyHtml+=`<div style="background:rgba(55,138,221,.06);border-radius:10px;padding:9px 12px;margin-bottom:6px;font-size:.82rem;color:var(--text);line-height:1.5">${m.replace(/\|/g,' <span style="opacity:.4">→</span> ')}</div>`;
+        });
+        bodyHtml+='</div>';
+      });
+    }
+    if(jar.mems&&jar.mems.length){
+      hasAny=true;
+      bodyHtml+=`<div style="margin-bottom:14px"><p style="font-size:.62rem;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--b4);opacity:.8;margin-bottom:8px">💬 Text Memories</p>`;
+      jar.mems.forEach(m=>{
+        bodyHtml+=`<div style="background:rgba(55,138,221,.06);border-radius:10px;padding:9px 12px;margin-bottom:6px;font-size:.82rem;color:var(--text);line-height:1.5">${m}</div>`;
+      });
+      bodyHtml+='</div>';
+    }
+    if(jar.photoCount){
+      bodyHtml+=`<div style="font-size:.78rem;color:var(--muted);font-style:italic;padding:8px 0">📸 ${jar.photoCount} photo${jar.photoCount>1?'s':''} were also in this jar</div>`;
+    }
+    if(!hasAny) bodyHtml+='<p style="font-size:.8rem;color:var(--muted);font-style:italic">No text messages found in this jar.</p>';
+    bodyHtml+='</div>';
+    body.innerHTML=bodyHtml;
+    // Toggle expand
+    header.addEventListener('click',()=>{
+      const open=body.style.display==='none';
+      body.style.display=open?'block':'none';
+      body.style.padding=open?'0 20px 20px':'0 20px 0';
+      header.querySelector('.jar-arrow').textContent=open?'▲':'▼';
+    });
+    wrapper.appendChild(header);
+    wrapper.appendChild(body);
+    list.appendChild(wrapper);
+  });
+}
+
+function closeCompletion(){
+  document.getElementById('completion-screen').classList.remove('show');
 }
 
 // ── BG STARS ──
