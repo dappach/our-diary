@@ -166,7 +166,7 @@ audio{width:100%;accent-color:#b8860b}
 .btn-rr:hover{transform:translateY(-2px)}
 
 /* ── HISTORY PANEL ── */
-#history-panel{display:none;position:fixed;inset:0;z-index:850;background:rgba(4,14,36,.97);backdrop-filter:blur(20px);overflow-y:auto}
+#history-panel{display:none}
 .hist-inner{max-width:540px;margin:0 auto;padding:80px 24px 60px}
 .hist-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px}
 .hist-title{font-family:'Playfair Display',serif;font-size:1.4rem;color:#fff;font-style:italic}
@@ -212,7 +212,7 @@ audio{width:100%;accent-color:#b8860b}
 .cal-stat-lbl{font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-top:3px}
 
 /* ── ADMIN GATE ── */
-#admin-gate{position:fixed;inset:0;z-index:9999;background:rgba(4,14,36,.97);backdrop-filter:blur(20px);padding:24px}
+#admin-gate{display:none}
 .admin-card{background:rgba(255,255,255,.05);border:1px solid rgba(55,138,221,.25);border-radius:26px;padding:38px 34px;max-width:390px;width:100%;text-align:center}
 .act{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;color:#fff;margin-bottom:5px}
 .acs{font-family:'Cormorant Garamond',serif;font-size:.93rem;font-style:italic;color:var(--muted);margin-bottom:24px}
@@ -223,7 +223,7 @@ audio{width:100%;accent-color:#b8860b}
 .admin-err{margin-top:10px;font-size:.78rem;color:var(--b5);font-style:italic;min-height:16px}
 
 /* ── ADMIN PANEL ── */
-#admin-panel{position:fixed;inset:0;z-index:9999;background:rgba(4,14,36,.97);overflow-y:auto}
+#admin-panel{display:none}
 .admin-inner{max-width:610px;margin:0 auto;padding:76px 24px 60px}
 .admin-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:30px;flex-wrap:wrap;gap:12px}
 .admin-hdr-title{font-family:'Playfair Display',serif;font-size:1.45rem;color:#fff}
@@ -292,9 +292,8 @@ footer p{font-family:'Cormorant Garamond',serif;font-size:1rem;font-style:italic
   <a href="jar.html" class="active">For My Mirakiii</a>
   <a href="hidden.html">✦ Hidden</a>
   <div style="margin-left:auto;display:flex;gap:6px;flex-shrink:0;align-items:center">
-    <button onclick="openMsgHistory()" style="background:rgba(10,30,74,.8);border:1px solid rgba(55,138,221,.22);border-radius:10px;padding:6px 11px;font-size:.67rem;font-weight:500;color:var(--b5);cursor:pointer;white-space:nowrap;transition:all .25s">📜 History</button>
-    <button onclick="openHistory()" style="background:rgba(10,30,74,.8);border:1px solid rgba(55,138,221,.22);border-radius:10px;padding:6px 11px;font-size:.67rem;font-weight:500;color:var(--b5);cursor:pointer;white-space:nowrap;transition:all .25s">🎁 Gifts</button>
-    <button onclick="openAdminGate()" style="background:rgba(10,30,74,.8);border:1px solid rgba(55,138,221,.22);border-radius:10px;padding:6px 11px;font-size:.67rem;font-weight:500;color:var(--muted);cursor:pointer;white-space:nowrap;transition:all .25s">⚙️ Admin</button>
+    <button onclick="openMsgHistory()" style="background:rgba(10,30,74,.8);border:1px solid rgba(55,138,221,.22);border-radius:10px;padding:6px 11px;font-size:.67rem;font-weight:500;color:var(--b5);cursor:pointer;white-space:nowrap">📜 History</button>
+    <button onclick="openHistory()" style="background:rgba(10,30,74,.8);border:1px solid rgba(55,138,221,.22);border-radius:10px;padding:6px 11px;font-size:.67rem;font-weight:500;color:var(--b5);cursor:pointer;white-space:nowrap">🎁 Gifts</button>
   </div>
 </nav>
 
@@ -562,7 +561,7 @@ footer p{font-family:'Cormorant Garamond',serif;font-size:1rem;font-style:italic
   <div class="hist-inner">
     <div class="hist-hdr">
       <p class="hist-title">🎁 Gift History</p>
-      <button class="btn-hist-close" onclick="document.getElementById('history-panel').style.cssText='display:none'">✕ Close</button>
+      <button class="btn-hist-close" onclick="document.getElementById('history-panel').style.display='none'">✕ Close</button>
     </div>
     <p class="hist-section-title">Gifts claimed</p>
     <div id="hist-gift-list"></div>
@@ -576,7 +575,7 @@ footer p{font-family:'Cormorant Garamond',serif;font-size:1rem;font-style:italic
   <div style="max-width:580px;margin:0 auto;padding:80px 24px 60px">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:28px;flex-wrap:wrap;gap:12px">
       <p style="font-family:'Playfair Display',serif;font-size:1.4rem;color:#fff;font-style:italic">📜 Message History</p>
-      <button class="btn-hist-close" onclick="document.getElementById('msg-history-panel').style.cssText='display:none'">✕ Close</button>
+      <button class="btn-hist-close" onclick="document.getElementById('msg-history-panel').style.display='none'">✕ Close</button>
     </div>
     <p style="font-size:.78rem;color:var(--muted);font-style:italic;margin-bottom:24px;line-height:1.6">Every jar that was filled with love — so you never repeat the same words twice 💙</p>
     <div id="msg-hist-list"></div>
@@ -584,7 +583,7 @@ footer p{font-family:'Cormorant Garamond',serif;font-size:1rem;font-style:italic
 </div>
 
 <!-- ADMIN GATE -->
-<div id="admin-gate" style="display:none;">
+<div id="admin-gate" style="display:none">
   <div class="admin-card">
     <p class="act">🔐 Admin</p><p class="acs">only you know the way in</p>
     <input type="password" class="a-input" id="admin-pw" placeholder="password" maxlength="30"/>
@@ -595,11 +594,11 @@ footer p{font-family:'Cormorant Garamond',serif;font-size:1rem;font-style:italic
 </div>
 
 <!-- ADMIN PANEL -->
-<div id="admin-panel" style="display:none;">
+<div id="admin-panel" style="display:none">
   <div class="admin-inner">
     <div class="admin-hdr">
       <p class="admin-hdr-title">⚙️ Admin Panel</p>
-      <button class="btn-close-a" onclick="document.getElementById('admin-panel').style.cssText='display:none'">✕ Close</button>
+      <button class="btn-close-a" onclick="document.getElementById('admin-panel').style.display='none'">✕ Close</button>
     </div>
 
     <!-- Gift delivery management -->
@@ -1168,8 +1167,14 @@ function closeRewardResult(){document.getElementById('reward-result').classList.
 
 // ── HISTORY PANEL ──
 function openHistory(){
-  const hp = document.getElementById('history-panel');
-  hp.style.cssText='display:block;position:fixed;inset:0;z-index:9998;background:rgba(4,14,36,.97);backdrop-filter:blur(20px);overflow-y:auto';
+  var hp=document.getElementById('history-panel');
+  hp.style.display='block';
+  hp.style.position='fixed';
+  hp.style.top='0';hp.style.left='0';hp.style.right='0';hp.style.bottom='0';
+  hp.style.zIndex='9999';
+  hp.style.background='rgba(4,14,36,0.97)';
+  hp.style.backdropFilter='blur(20px)';
+  hp.style.overflowY='auto';
   renderHistoryPanel();
 }
 function renderHistoryPanel(){
@@ -1291,28 +1296,69 @@ function showDayPopup(el,day,data){
 function hideDayPopup(){document.getElementById('day-popup').classList.remove('show')}
 document.addEventListener('click',e=>{if(!e.target.closest('.cal-day')&&!e.target.closest('#day-popup'))hideDayPopup()});
 
-// ── ADMIN ──
+// ── ADMIN — logo tap 5 times ──
 let tapC=0,tapT=null;
-document.getElementById('logo-tap').addEventListener('click',()=>{
-  tapC++;clearTimeout(tapT);tapT=setTimeout(()=>tapC=0,1800);
-  if(tapC>=5){tapC=0;openAdminGate();}
+document.getElementById('logo-tap').addEventListener('click',function(){
+  tapC++;
+  clearTimeout(tapT);
+  tapT=setTimeout(function(){tapC=0;},2000);
+  if(tapC>=5){
+    tapC=0;
+    openAdminGate();
+  }
 });
-function openAdminGate(){
-  const gate = document.getElementById('admin-gate');
-  gate.style.cssText = 'display:flex;align-items:center;justify-content:center;position:fixed;inset:0;z-index:9999;background:rgba(4,14,36,.97);backdrop-filter:blur(20px);padding:24px';
-  document.getElementById('admin-pw').value = '';
-  document.getElementById('admin-err').textContent = '';
-  setTimeout(()=>{ try{document.getElementById('admin-pw').focus()}catch(e){} }, 150);
+
+function showPanel(el){
+  el.style.position='fixed';
+  el.style.top='0';
+  el.style.left='0';
+  el.style.right='0';
+  el.style.bottom='0';
+  el.style.zIndex='9999';
 }
-document.getElementById('admin-pw').addEventListener('keydown',e=>{if(e.key==='Enter')tryAdmin()});
+
+function openAdminGate(){
+  var gate=document.getElementById('admin-gate');
+  showPanel(gate);
+  gate.style.display='flex';
+  gate.style.alignItems='center';
+  gate.style.justifyContent='center';
+  gate.style.background='rgba(4,14,36,0.97)';
+  gate.style.backdropFilter='blur(20px)';
+  gate.style.padding='24px';
+  var pw=document.getElementById('admin-pw');
+  if(pw){pw.value='';setTimeout(function(){pw.focus();},200);}
+  var err=document.getElementById('admin-err');
+  if(err)err.textContent='';
+}
+
+document.getElementById('admin-pw').addEventListener('keydown',function(e){
+  if(e.key==='Enter')tryAdmin();
+});
+
 function tryAdmin(){
-  if(document.getElementById('admin-pw').value===ADMIN_PASS){
-    document.getElementById('admin-gate').style.cssText='display:none';
-    const panel = document.getElementById('admin-panel');
-    panel.style.cssText='display:block;position:fixed;inset:0;z-index:9999;background:rgba(4,14,36,.97);overflow-y:auto';
-    document.getElementById('edit-locked').value=getLocked();
+  var pw=document.getElementById('admin-pw');
+  var err=document.getElementById('admin-err');
+  if(!pw)return;
+  if(pw.value===ADMIN_PASS){
+    // hide gate
+    var gate=document.getElementById('admin-gate');
+    gate.style.display='none';
+    // show panel
+    var panel=document.getElementById('admin-panel');
+    showPanel(panel);
+    panel.style.display='block';
+    panel.style.background='rgba(4,14,36,0.97)';
+    panel.style.overflowY='auto';
+    // load data
+    var el=document.getElementById('edit-locked');
+    if(el)el.value=getLocked();
     renderPreviews();renderList();renderFoodAdmin();renderAdminGiftList();
-  } else {document.getElementById('admin-err').textContent='wrong password ✗';document.getElementById('admin-pw').value='';}
+  } else {
+    if(err)err.textContent='wrong password ✗';
+    pw.value='';
+    pw.focus();
+  }
 }
 
 // ── ADMIN GIFT LIST (mark delivered) ──
@@ -1400,8 +1446,14 @@ if(isJarCompleted()){
 
 // ── MESSAGE HISTORY ──
 function openMsgHistory(){
-  const mhp = document.getElementById('msg-history-panel');
-  mhp.style.cssText='display:block;position:fixed;inset:0;z-index:9998;background:rgba(4,14,36,.97);backdrop-filter:blur(20px);overflow-y:auto';
+  var mhp=document.getElementById('msg-history-panel');
+  mhp.style.display='block';
+  mhp.style.position='fixed';
+  mhp.style.top='0';mhp.style.left='0';mhp.style.right='0';mhp.style.bottom='0';
+  mhp.style.zIndex='9999';
+  mhp.style.background='rgba(4,14,36,0.97)';
+  mhp.style.backdropFilter='blur(20px)';
+  mhp.style.overflowY='auto';
   renderMsgHistoryPanel();
 }
 
