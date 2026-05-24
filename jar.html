@@ -658,7 +658,107 @@ footer p{font-family:'Cormorant Garamond',serif;font-size:1rem;font-style:italic
   </div>
 </div>
 
-<script>
+<!-- Firebase SDK -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, doc, setDoc, getDoc, onSnapshot, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+// ══════════════════════════════════════════
+// FIREBASE CONFIG
+// ══════════════════════════════════════════
+const firebaseConfig = {
+  apiKey: "AIzaSyB0YJSRJTPryKzupAfIePq_ycFPVSLbkTQ",
+  authDomain: "our-diary-mh.firebaseapp.com",
+  projectId: "our-diary-mh",
+  storageBucket: "our-diary-mh.firebasestorage.app",
+  messagingSenderId: "289304289773",
+  appId: "1:289304289773:web:a021aa72601ec8222f87e4",
+  measurementId: "G-JRFEQSJ1Z9"
+};
+
+const fbApp = initializeApp(firebaseConfig);
+const db = getFirestore(fbApp);
+
+// ══════════════════════════════════════════
+// FIREBASE SYNC HELPERS
+// ══════════════════════════════════════════
+// Save any key to Firestore (replaces localStorage for shared data)
+async function fbSet(key, value) {
+  try {
+    await setDoc(doc(db, 'jar_data', key), { value: JSON.stringify(value) });
+  } catch(e) { console.warn('fbSet error:', e); }
+}
+
+// Get a key from Firestore
+async function fbGet(key, fallback) {
+  try {
+    const snap = await getDoc(doc(db, 'jar_data', key));
+    if (snap.exists()) return JSON.parse(snap.data().value);
+  } catch(e) { console.warn('fbGet error:', e); }
+  return fallback;
+}
+
+// Override sd() to save to BOTH localStorage and Firestore
+const _originalSd = function(k,v){ localStorage.setItem(k,JSON.stringify(v)); };
+window.sd = function(k, v) {
+  _originalSd(k, v); // save locally immediately (fast)
+  fbSet(k, v);       // sync to Firebase (for other phone)
+};
+
+// Load all data from Firebase on startup (overrides localStorage)
+async function loadFromFirebase() {
+  const sharedKeys = [
+    'jar_msgs','jar_mems','jar_voices','jar_photos',
+    'jar_locked','jar_food','jar_history','jar_gift_history',
+    'jar_opened_count','jar_completed','jar_msg_archive'
+  ];
+  for (const key of sharedKeys) {
+    try {
+      const snap = await getDoc(doc(db, 'jar_data', key));
+      if (snap.exists()) {
+        localStorage.setItem(key, snap.data().value);
+      }
+    } catch(e) {}
+  }
+  // After loading from Firebase, refresh the UI
+  updateProgress();
+  if(typeof isJarCompleted==='function' && isJarCompleted()){
+    const total=getTotalMsgs(),opened=getOpenedCount();
+    if(total===0||opened>=total) renderLockedJarState(true);
+  }
+  renderList && renderList();
+  console.log('✅ Loaded from Firebase');
+}
+
+// Listen for real-time changes (when you update from your phone, her phone updates instantly)
+function listenForChanges() {
+  const keysToWatch = ['jar_msgs','jar_mems','jar_food','jar_locked','jar_gift_history','jar_opened_count','jar_completed'];
+  keysToWatch.forEach(key => {
+    onSnapshot(doc(db, 'jar_data', key), (snap) => {
+      if (snap.exists()) {
+        const newVal = snap.data().value;
+        const oldVal = localStorage.getItem(key);
+        if (newVal !== oldVal) {
+          localStorage.setItem(key, newVal);
+          // Refresh UI for important keys
+          if (key === 'jar_msgs' || key === 'jar_mems') {
+            updateProgress && updateProgress();
+            Object.keys(catPools||{}).forEach(k=>delete catPools[k]);
+          }
+          if (key === 'jar_opened_count') updateProgress && updateProgress();
+          if (key === 'jar_completed' && JSON.parse(newVal)) {
+            renderLockedJarState && renderLockedJarState(true);
+          }
+          if (key === 'jar_food') renderLoveMenu && renderLoveMenu();
+        }
+      }
+    });
+  });
+}
+
+// Start: load then listen
+loadFromFirebase().then(() => listenForChanges());
+
 // ══════════════════════════════════════════
 // GALAXY + FIREFLY MAGIC CANVAS INSIDE JAR
 // ══════════════════════════════════════════
