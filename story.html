@@ -457,6 +457,73 @@ footer p{font-family:'Cormorant Garamond',serif;font-size:1.05rem;font-style:ita
   .float-quote{position:relative;margin-bottom:14px}
 }
 </style>
+<!-- Firebase SDK -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, doc, setDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyB0YJSRJTPryKzupAfIePq_ycFPVSLbkTQ",
+  authDomain: "our-diary-mh.firebaseapp.com",
+  projectId: "our-diary-mh",
+  storageBucket: "our-diary-mh.firebasestorage.app",
+  messagingSenderId: "289304289773",
+  appId: "1:289304289773:web:a021aa72601ec8222f87e4"
+};
+
+const fbApp = initializeApp(firebaseConfig);
+const db = getFirestore(fbApp);
+const STORY_DOC = 'story_data_v2';
+
+// Save story data to Firebase
+window.fbSaveStory = async function(data) {
+  try {
+    await setDoc(doc(db, 'story_data', STORY_DOC), { value: JSON.stringify(data) });
+  } catch(e) { console.warn('Firebase save error:', e); }
+};
+
+// Load story data from Firebase
+window.fbLoadStory = async function() {
+  try {
+    const snap = await getDoc(doc(db, 'story_data', STORY_DOC));
+    if (snap.exists()) {
+      const data = JSON.parse(snap.data().value);
+      localStorage.setItem('story_data_v2', JSON.stringify(data));
+      return data;
+    }
+  } catch(e) { console.warn('Firebase load error:', e); }
+  return null;
+};
+
+// Convert image file to base64 and return it
+window.fileToBase64 = function(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = e => resolve(e.target.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+};
+
+// Load from Firebase on startup, then listen for changes
+window.fbLoadStory().then(data => {
+  if (data && window.applyFirebaseData) {
+    window.applyFirebaseData(data);
+  }
+});
+
+// Listen for real-time changes from admin phone
+onSnapshot(doc(db, 'story_data', STORY_DOC), (snap) => {
+  if (snap.exists()) {
+    try {
+      const data = JSON.parse(snap.data().value);
+      localStorage.setItem('story_data_v2', JSON.stringify(data));
+      if (window.applyFirebaseData) window.applyFirebaseData(data);
+    } catch(e) {}
+  }
+});
+
+</script>
 </head>
 <body>
 <div class="bg"></div>
@@ -709,9 +776,13 @@ footer p{font-family:'Cormorant Garamond',serif;font-size:1.05rem;font-style:ita
     <!-- SCHOOL -->
     <div class="ap-tab-content active" id="tab-school">
       <div class="ap-sec">
-        <p class="ap-sec-title">📘 Hero Image URL</p>
-        <input type="text" class="ap-input" id="ap-school-hero" placeholder="https://..."/>
-        <button class="ap-save" onclick="saveSection('school')">Save</button><span class="ap-ok" id="ok-school-hero"></span>
+        <p class="ap-sec-title">📘 Hero Image</p>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:8px">
+          <button class="ap-save" onclick="document.getElementById('fi-school-hero').click()">📂 Choose Photo</button>
+          <input type="file" accept="image/*" id="fi-school-hero" style="display:none" onchange="uploadImg(this,'schoolHero','ap-school-hero-prev')"/>
+          <span style="font-size:.75rem;color:var(--muted)" id="ap-school-hero-prev">no photo yet</span>
+        </div>
+        <span class="ap-ok" id="ok-school-hero"></span>
       </div>
       <div class="ap-sec">
         <p class="ap-sec-title">📝 Intro Text</p>
@@ -729,8 +800,12 @@ footer p{font-family:'Cormorant Garamond',serif;font-size:1.05rem;font-style:ita
     <!-- GTEC -->
     <div class="ap-tab-content" id="tab-gtec">
       <div class="ap-sec">
-        <p class="ap-sec-title">💎 Hero Image URL</p>
-        <input type="text" class="ap-input" id="ap-gtec-hero" placeholder="https://..."/>
+        <p class="ap-sec-title">💎 Hero Image</p>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:8px">
+          <button class="ap-save" onclick="document.getElementById('fi-gtec-hero').click()">📂 Choose Photo</button>
+          <input type="file" accept="image/*" id="fi-gtec-hero" style="display:none" onchange="uploadImg(this,'gtecHero','ap-gtec-hero-prev')"/>
+          <span style="font-size:.75rem;color:var(--muted)" id="ap-gtec-hero-prev">no photo yet</span>
+        </div>
       </div>
       <div class="ap-sec">
         <p class="ap-sec-title">📝 Intro Text</p>
@@ -769,8 +844,12 @@ footer p{font-family:'Cormorant Garamond',serif;font-size:1.05rem;font-style:ita
         <textarea class="ap-textarea" id="ap-letters" style="min-height:100px" placeholder="I choose you every day.&#10;You are my favourite place."></textarea>
       </div>
       <div class="ap-sec">
-        <p class="ap-sec-title">🖼️ Final Scene Photo URL</p>
-        <input type="text" class="ap-input" id="ap-final-img" placeholder="https://..."/>
+        <p class="ap-sec-title">🖼️ Final Scene Photo</p>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:8px">
+          <button class="ap-save" onclick="document.getElementById('fi-final-img').click()">📂 Choose Photo</button>
+          <input type="file" accept="image/*" id="fi-final-img" style="display:none" onchange="uploadImg(this,'finalImg','ap-final-img-prev')"/>
+          <span style="font-size:.75rem;color:var(--muted)" id="ap-final-img-prev">no photo yet</span>
+        </div>
       </div>
       <div class="ap-sec">
         <p class="ap-sec-title">💬 Final Quote</p>
@@ -887,8 +966,20 @@ function getDefaultData(){
 }
 
 function getD(){ try{ const d=JSON.parse(localStorage.getItem(DATA_KEY)||'null'); return d||getDefaultData(); }catch(e){ return getDefaultData(); } }
-function saveD(d){ localStorage.setItem(DATA_KEY,JSON.stringify(d)); }
+function saveD(d){
+  localStorage.setItem(DATA_KEY,JSON.stringify(d));
+  // Sync to Firebase so both phones get updates
+  if(window.fbSaveStory) window.fbSaveStory(d);
+}
 let D = getD();
+
+// Apply Firebase data to local storage and re-render
+window.applyFirebaseData = function(data) {
+  localStorage.setItem(DATA_KEY, JSON.stringify(data));
+  D = data;
+  if(typeof renderAll === 'function') renderAll();
+  if(typeof spawnSecretStars === 'function') spawnSecretStars();
+};
 
 // streak
 const loginDays=JSON.parse(localStorage.getItem('mirakiii_loginDays')||'[]');
