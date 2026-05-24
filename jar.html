@@ -1398,15 +1398,32 @@ document.addEventListener('click',e=>{if(!e.target.closest('.cal-day')&&!e.targe
 
 // ── ADMIN — logo tap 5 times ──
 let tapC=0,tapT=null;
-document.getElementById('logo-tap').addEventListener('click',function(){
+// Use DOMContentLoaded to ensure element exists
+document.addEventListener('DOMContentLoaded', function() {
+  var logoEl = document.getElementById('logo-tap');
+  if(logoEl) {
+    logoEl.addEventListener('click', function(){
+      tapC++;
+      clearTimeout(tapT);
+      tapT = setTimeout(function(){tapC=0;}, 2000);
+      if(tapC>=5){ tapC=0; openAdminGate(); }
+    });
+  }
+});
+// Also attach directly in case DOM already loaded
+(function attachLogo(){
+  var logoEl = document.getElementById('logo-tap');
+  if(logoEl) {
+    logoEl.addEventListener('click',function(){
   tapC++;
   clearTimeout(tapT);
   tapT=setTimeout(function(){tapC=0;},2000);
-  if(tapC>=5){
-    tapC=0;
-    openAdminGate();
+    if(tapC>=5){ tapC=0; openAdminGate(); }
+    });
+  } else {
+    setTimeout(attachLogo, 300);
   }
-});
+})();
 
 function showPanel(el){
   el.style.position='fixed';
@@ -1628,6 +1645,46 @@ function renderMsgHistoryPanel(){
 function closeCompletion(){
   document.getElementById('completion-screen').classList.remove('show');
 }
+
+// ══════════════════════════════════════════
+// EXPOSE ALL FUNCTIONS TO WINDOW (needed for onclick handlers)
+// ══════════════════════════════════════════
+window.showScreen       = showScreen;
+window.jarClick         = jarClick;
+window.pickCat          = pickCat;
+window.magicPick        = magicPick;
+window.pickAnother      = pickAnother;
+window.markHelped       = markHelped;
+window.closeLetter      = closeLetter;
+window.showWorst        = showWorst;
+window.resetWorst       = resetWorst;
+window.openLoveMenu     = openLoveMenu;
+window.selectFood       = selectFood;
+window.closeRewardResult= closeRewardResult;
+window.openHistory      = openHistory;
+window.openMsgHistory   = openMsgHistory;
+window.renderHistoryPanel = renderHistoryPanel;
+window.renderMsgHistoryPanel = renderMsgHistoryPanel;
+window.changeMonth      = changeMonth;
+window.openAdminGate    = openAdminGate;
+window.tryAdmin         = tryAdmin;
+window.addMsg           = addMsg;
+window.addPhoto         = addPhoto;
+window.addVoice         = addVoice;
+window.addMem           = addMem;
+window.saveLockedNote   = saveLockedNote;
+window.renderList       = renderList;
+window.delMsg           = delMsg;
+window.renderFoodAdmin  = renderFoodAdmin;
+window.toggleFood       = toggleFood;
+window.deleteFood       = deleteFood;
+window.addFoodItem      = addFoodItem;
+window.renderAdminGiftList = renderAdminGiftList;
+window.markDelivered    = markDelivered;
+window.adminResetJar    = adminResetJar;
+window.closeCompletion  = closeCompletion;
+window.pigYes           = pigYes;
+window.pigNo            = pigNo;
 
 // ── BG STARS ──
 (function(){
