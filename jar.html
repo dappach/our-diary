@@ -698,12 +698,13 @@ async function fbGet(key, fallback) {
   return fallback;
 }
 
-// Override sd() to save to BOTH localStorage and Firestore
-const _originalSd = function(k,v){ localStorage.setItem(k,JSON.stringify(v)); };
-window.sd = function(k, v) {
-  _originalSd(k, v); // save locally immediately (fast)
-  fbSet(k, v);       // sync to Firebase (for other phone)
-};
+// sd() saves to BOTH localStorage AND Firebase
+// This works for both internal calls (sd()) and onclick calls (window.sd())
+function sd(k, v) {
+  localStorage.setItem(k, JSON.stringify(v)); // save locally immediately
+  fbSet(k, v);                                 // sync to Firebase
+}
+window.sd = sd; // expose to global scope for onclick handlers
 
 // Load all data from Firebase on startup (overrides localStorage)
 async function loadFromFirebase() {
@@ -742,8 +743,9 @@ function listenForChanges() {
           localStorage.setItem(key, newVal);
           // Refresh UI for important keys
           if (key === 'jar_msgs' || key === 'jar_mems') {
-            updateProgress && updateProgress();
-            Object.keys(catPools||{}).forEach(k=>delete catPools[k]);
+            try { updateProgress(); } catch(e){}
+            try { Object.keys(catPools||{}).forEach(k=>delete catPools[k]); } catch(e){}
+            try { if(document.getElementById('msg-list')) renderList(); } catch(e){}
           }
           if (key === 'jar_opened_count') updateProgress && updateProgress();
           if (key === 'jar_completed' && JSON.parse(newVal)) {
@@ -757,7 +759,16 @@ function listenForChanges() {
 }
 
 // Start: load then listen
-loadFromFirebase().then(() => listenForChanges());
+loadFromFirebase().then(() => {
+  listenForChanges();
+  // After loading from Firebase, update all UI
+  try { updateProgress(); } catch(e){}
+  try { renderList && renderList(); } catch(e){}
+  console.log('✅ Firebase ready - both phones will now sync');
+}).catch(e => {
+  console.warn('Firebase load failed, using local data:', e);
+  // Still works offline with localStorage
+});
 
 // ══════════════════════════════════════════
 // GALAXY + FIREFLY MAGIC CANVAS INSIDE JAR
@@ -937,7 +948,7 @@ const DEF_MEMS = ["Remember that day we couldn't stop laughing? I think about it
 const DEF_FOOD = [{emoji:'🍫',name:'Chocolate',enabled:true,deliverToday:false,voice:null},{emoji:'🍰',name:'Cake',enabled:true,deliverToday:false,voice:null},{emoji:'🍟',name:'Fries',enabled:true,deliverToday:true,voice:null},{emoji:'🍕',name:'Pizza',enabled:true,deliverToday:false,voice:null},{emoji:'🧋',name:'Milkshake',enabled:true,deliverToday:false,voice:null}];
 
 function gd(k,fb){try{const v=JSON.parse(localStorage.getItem(k));return(v!==null&&v!==undefined)?v:fb}catch{return fb}}
-function sd(k,v){localStorage.setItem(k,JSON.stringify(v))}
+// sd() is defined above using Firebase sync (window.sd)
 const getMsgs=()=>gd('jar_msgs',DEF);
 const getMems=()=>gd('jar_mems',DEF_MEMS);
 const getVoices=()=>gd('jar_voices',[]);
