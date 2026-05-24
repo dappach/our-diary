@@ -711,7 +711,11 @@ async function loadFromFirebase() {
   const sharedKeys = [
     'jar_msgs','jar_mems','jar_voices','jar_photos',
     'jar_locked','jar_food','jar_history','jar_gift_history',
-    'jar_opened_count','jar_completed','jar_msg_archive'
+    'jar_opened_count','jar_completed','jar_msg_archive',
+    // shown message tracking per category — must sync so no repeats
+    'jar_shown_sad','jar_shown_missyou','jar_shown_smile',
+    'jar_shown_memory','jar_shown_motivation','jar_shown_cuteness',
+    'jar_shown_magic','jar_shown_mem','jar_shown_photo','jar_shown_voice'
   ];
   for (const key of sharedKeys) {
     try {
@@ -733,7 +737,12 @@ async function loadFromFirebase() {
 
 // Listen for real-time changes (when you update from your phone, her phone updates instantly)
 function listenForChanges() {
-  const keysToWatch = ['jar_msgs','jar_mems','jar_food','jar_locked','jar_gift_history','jar_opened_count','jar_completed'];
+  const keysToWatch = [
+    'jar_msgs','jar_mems','jar_food','jar_locked',
+    'jar_gift_history','jar_opened_count','jar_completed',
+    'jar_shown_sad','jar_shown_missyou','jar_shown_smile',
+    'jar_shown_memory','jar_shown_motivation','jar_shown_cuteness'
+  ];
   keysToWatch.forEach(key => {
     onSnapshot(doc(db, 'jar_data', key), (snap) => {
       if (snap.exists()) {
@@ -741,17 +750,24 @@ function listenForChanges() {
         const oldVal = localStorage.getItem(key);
         if (newVal !== oldVal) {
           localStorage.setItem(key, newVal);
-          // Refresh UI for important keys
+          // Refresh UI based on what changed
           if (key === 'jar_msgs' || key === 'jar_mems') {
             try { updateProgress(); } catch(e){}
             try { Object.keys(catPools||{}).forEach(k=>delete catPools[k]); } catch(e){}
             try { if(document.getElementById('msg-list')) renderList(); } catch(e){}
           }
-          if (key === 'jar_opened_count') updateProgress && updateProgress();
-          if (key === 'jar_completed' && JSON.parse(newVal)) {
-            renderLockedJarState && renderLockedJarState(true);
+          // When shown-messages list updates, clear in-memory pool so next pick is fresh
+          if (key.startsWith('jar_shown_')) {
+            const cat = key.replace('jar_shown_','');
+            try { delete catPools[cat]; } catch(e){}
           }
-          if (key === 'jar_food') renderLoveMenu && renderLoveMenu();
+          if (key === 'jar_opened_count') { try{updateProgress();}catch(e){} }
+          if (key === 'jar_completed') {
+            try{
+              if(JSON.parse(newVal)) renderLockedJarState(true);
+            }catch(e){}
+          }
+          if (key === 'jar_food') { try{renderLoveMenu();}catch(e){} }
         }
       }
     });
@@ -960,20 +976,56 @@ const getGiftHistory=()=>gd('jar_gift_history',[]);  // [{id, emoji, name, date,
 const getOpenedCount=()=>gd('jar_opened_count',0);
 function getTotalMsgs(){const m=getMsgs();return Object.values(m).flat().length+getMems().length+getPhotos().length}
 
+// ── PERSISTENT NO-REPEAT POOL ──
+// Tracks shown messages in localStorage+Firebase so never repeats across sessions/reloads
 const catPools={};
+
+function getShownMsgs(cat){
+  try{ return JSON.parse(localStorage.getItem('jar_shown_'+cat)||'[]'); }catch{return[];}
+}
+function saveShownMsgs(cat, arr){
+  // Save locally first (instant)
+  localStorage.setItem('jar_shown_'+cat, JSON.stringify(arr));
+  // Sync to Firebase (so both phones track same shown messages)
+  fbSet('jar_shown_'+cat, arr);
+}
+function clearShownMsgs(cat){
+  localStorage.removeItem('jar_shown_'+cat);
+  fbSet('jar_shown_'+cat, []);
+}
+
 function getCatPool(cat){
-  if(!catPools[cat]){
-    const msgs=getMsgs();
-    const pool=(msgs[cat]||DEF[cat]||[]).slice();
-    for(let i=pool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[pool[i],pool[j]]=[pool[j],pool[i]]}
-    catPools[cat]=pool;
+  const msgs = getMsgs();
+  const allMsgs = (msgs[cat]||DEF[cat]||[]).slice();
+  const shown = getShownMsgs(cat);
+  // filter out already shown messages
+  let remaining = allMsgs.filter(m => !shown.includes(m));
+  // if all shown, reset for this category
+  if(remaining.length === 0){
+    clearShownMsgs(cat);
+    remaining = allMsgs.slice();
   }
+  // shuffle remaining
+  for(let i=remaining.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [remaining[i],remaining[j]]=[remaining[j],remaining[i]];
+  }
+  catPools[cat] = remaining;
   return catPools[cat];
 }
+
 function pickFromPool(cat){
-  let pool=getCatPool(cat);
-  if(!pool.length){delete catPools[cat];pool=getCatPool(cat)}
-  return pool.pop();
+  // Always rebuild from persistent shown list
+  const pool = getCatPool(cat);
+  if(!pool.length) return (getMsgs()[cat]||DEF[cat]||['I am here for you 💙'])[0];
+  const picked = pool[0]; // pick first from shuffled remaining
+  // Mark as shown
+  const shown = getShownMsgs(cat);
+  if(!shown.includes(picked)){
+    shown.push(picked);
+    saveShownMsgs(cat, shown);
+  }
+  return picked;
 }
 
 // ── SCREENS ──
