@@ -1450,37 +1450,103 @@ function collectSecrets(){
   }));
 }
 
+// ── Upload image from file picker, convert to base64, save immediately ──
+function uploadImgForMem(inputEl, journey, memId){
+  const file = inputEl.files[0]; if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    updMem(journey, memId, 'imgUrl', e.target.result);
+    // show tiny preview next to button
+    const prev = inputEl.parentNode.querySelector('.img-prev-thumb');
+    if(prev){ prev.src = e.target.result; prev.style.display='block'; }
+    // auto save
+    const d = getD(); saveD(d);
+    showOk('ok-'+journey);
+  };
+  reader.readAsDataURL(file);
+}
+
+function uploadImgForGallery(inputEl, galId){
+  const file = inputEl.files[0]; if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    updGallery(galId, 'imgUrl', e.target.result);
+    const prev = inputEl.parentNode.querySelector('.img-prev-thumb');
+    if(prev){ prev.src = e.target.result; prev.style.display='block'; }
+    const d = getD(); saveD(d);
+    showOk('ok-gtec');
+  };
+  reader.readAsDataURL(file);
+}
+
+// Upload for top-level fields (hero, final)
+window.uploadImg = async function(inputEl, field, prevId){
+  const file = inputEl.files[0]; if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const d = getD();
+    d[field] = e.target.result;
+    saveD(d); D = d;
+    const prev = document.getElementById(prevId);
+    if(prev){ prev.textContent = '✅ '+file.name; }
+    renderAll();
+  };
+  reader.readAsDataURL(file);
+};
+
 function renderAdminLists(){
   const d=getD();
   ['school','gtec','present'].forEach(j=>{
     const el=document.getElementById('ap-'+j+'-list'); if(!el)return;
     el.innerHTML=(d[getMemKey(j)]||[]).map(m=>`
       <div class="mem-admin-card" data-mem-journey="${j}" data-mem-id="${m.id}">
-        <div class="mem-admin-card-hdr"><span class="mem-admin-card-title">${esc(m.title||'Untitled')}</span><button class="ap-btn-danger" onclick="delMemory('${j}','${m.id}')">Delete</button></div>
-        <input class="ap-input" style="margin-bottom:6px" placeholder="Date label" value="${esc(m.date)}" data-f="date" oninput="updMem('${j}','${m.id}','date',this.value)"/>
-        <input class="ap-input" style="margin-bottom:6px" placeholder="Title" value="${esc(m.title)}" data-f="title" oninput="updMem('${j}','${m.id}','title',this.value)"/>
-        <textarea class="ap-textarea" placeholder="Memory text…" data-f="text" oninput="updMem('${j}','${m.id}','text',this.value)">${esc(m.text)}</textarea>
-        <input class="ap-input" style="margin-bottom:6px" placeholder="Mood (e.g. ✨ nostalgic)" value="${esc(m.mood)}" data-f="mood" oninput="updMem('${j}','${m.id}','mood',this.value)"/>
-        <input class="ap-input" style="margin-bottom:6px" placeholder="Image URL" value="${esc(m.imgUrl)}" data-f="imgUrl" oninput="updMem('${j}','${m.id}','imgUrl',this.value)"/>
-        <input class="ap-input" placeholder="Voice note URL" value="${esc(m.voice)}" data-f="voice" oninput="updMem('${j}','${m.id}','voice',this.value)"/>
+        <div class="mem-admin-card-hdr">
+          <span class="mem-admin-card-title">${esc(m.title||'Untitled')}</span>
+          <button class="ap-btn-danger" onclick="delMemory('${j}','${m.id}')">Delete</button>
+        </div>
+        <input class="ap-input" style="margin-bottom:6px" placeholder="Date label" value="${esc(m.date)}" oninput="updMem('${j}','${m.id}','date',this.value)"/>
+        <input class="ap-input" style="margin-bottom:6px" placeholder="Title" value="${esc(m.title)}" oninput="updMem('${j}','${m.id}','title',this.value)"/>
+        <textarea class="ap-textarea" placeholder="Memory text…" oninput="updMem('${j}','${m.id}','text',this.value)">${esc(m.text)}</textarea>
+        <input class="ap-input" style="margin-bottom:6px" placeholder="Mood (e.g. ✨ nostalgic)" value="${esc(m.mood)}" oninput="updMem('${j}','${m.id}','mood',this.value)"/>
+        <div style="margin-bottom:8px">
+          <p style="font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--b4);opacity:.8;margin-bottom:6px">📸 Memory Photo</p>
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+            <button class="ap-save" onclick="document.getElementById('fi-mem-${j}-${m.id}').click()" style="padding:7px 14px;font-size:.75rem">📂 Choose Photo</button>
+            <input type="file" accept="image/*" id="fi-mem-${j}-${m.id}" style="display:none" onchange="uploadImgForMem(this,'${j}','${m.id}')"/>
+            ${m.imgUrl ? `<img class="img-prev-thumb" src="${esc(m.imgUrl)}" style="width:48px;height:48px;object-fit:cover;border-radius:8px;border:1px solid rgba(55,138,221,.3)"/>` : `<img class="img-prev-thumb" style="display:none;width:48px;height:48px;object-fit:cover;border-radius:8px;border:1px solid rgba(55,138,221,.3)"/>`}
+            ${m.imgUrl ? `<span style="font-size:.72rem;color:var(--b5)">✅ photo added</span>` : `<span style="font-size:.72rem;color:var(--muted)">no photo yet</span>`}
+          </div>
+        </div>
+        <input class="ap-input" placeholder="Voice note URL (optional)" value="${esc(m.voice)}" oninput="updMem('${j}','${m.id}','voice',this.value)"/>
       </div>`).join('')||'<p style="font-size:.78rem;color:var(--muted);font-style:italic">No memories yet.</p>';
   });
 
   const gl=document.getElementById('ap-gtec-gallery-list'); if(gl){
     gl.innerHTML=(d.gtecGallery||[]).map(g=>`
       <div class="mem-admin-card" data-gal-id="${g.id}">
-        <div class="mem-admin-card-hdr"><span class="mem-admin-card-title">Gallery Item</span><button class="ap-btn-danger" onclick="delGallery('${g.id}')">Delete</button></div>
-        <input class="ap-input" style="margin-bottom:6px" placeholder="Image URL" value="${esc(g.imgUrl)}" data-gf="imgUrl" oninput="updGallery('${g.id}','imgUrl',this.value)"/>
-        <input class="ap-input" placeholder="Caption" value="${esc(g.caption)}" data-gf="caption" oninput="updGallery('${g.id}','caption',this.value)"/>
+        <div class="mem-admin-card-hdr">
+          <span class="mem-admin-card-title">Gallery Photo</span>
+          <button class="ap-btn-danger" onclick="delGallery('${g.id}')">Delete</button>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px">
+          <button class="ap-save" onclick="document.getElementById('fi-gal-${g.id}').click()" style="padding:7px 14px;font-size:.75rem">📂 Choose Photo</button>
+          <input type="file" accept="image/*" id="fi-gal-${g.id}" style="display:none" onchange="uploadImgForGallery(this,'${g.id}')"/>
+          ${g.imgUrl ? `<img class="img-prev-thumb" src="${esc(g.imgUrl)}" style="width:48px;height:48px;object-fit:cover;border-radius:8px;border:1px solid rgba(55,138,221,.3)"/>` : `<img class="img-prev-thumb" style="display:none;width:48px;height:48px;object-fit:cover;border-radius:8px"/>`}
+          ${g.imgUrl ? `<span style="font-size:.72rem;color:var(--b5)">✅ photo added</span>` : `<span style="font-size:.72rem;color:var(--muted)">no photo yet</span>`}
+        </div>
+        <input class="ap-input" placeholder="Caption" value="${esc(g.caption)}" oninput="updGallery('${g.id}','caption',this.value)"/>
       </div>`).join('')||'<p style="font-size:.78rem;color:var(--muted);font-style:italic">No gallery items.</p>';
   }
 
   const sl=document.getElementById('ap-secrets-list'); if(sl){
     sl.innerHTML=(d.secrets||[]).map(s=>`
       <div class="mem-admin-card" data-sec-id="${s.id}">
-        <div class="mem-admin-card-hdr"><span class="mem-admin-card-title">Secret Star</span><button class="ap-btn-danger" onclick="delSecret('${s.id}')">Delete</button></div>
-        <input class="ap-input" style="margin-bottom:6px" placeholder="Icon emoji (⭐🌙💫)" value="${esc(s.icon)}" data-sf="icon" oninput="updSecret('${s.id}','icon',this.value)"/>
-        <textarea class="ap-textarea" placeholder="Secret message when tapped…" data-sf="msg" oninput="updSecret('${s.id}','msg',this.value)">${esc(s.msg)}</textarea>
+        <div class="mem-admin-card-hdr">
+          <span class="mem-admin-card-title">Secret Star</span>
+          <button class="ap-btn-danger" onclick="delSecret('${s.id}')">Delete</button>
+        </div>
+        <input class="ap-input" style="margin-bottom:6px" placeholder="Icon emoji (⭐🌙💫)" value="${esc(s.icon)}" oninput="updSecret('${s.id}','icon',this.value)"/>
+        <textarea class="ap-textarea" placeholder="Secret message when tapped…" oninput="updSecret('${s.id}','msg',this.value)">${esc(s.msg)}</textarea>
       </div>`).join('')||'<p style="font-size:.78rem;color:var(--muted);font-style:italic">No secrets yet.</p>';
   }
 }
