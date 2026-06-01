@@ -779,11 +779,19 @@ loadFromFirebase().then(() => {
   listenForChanges();
   // After loading from Firebase, update all UI
   try { updateProgress(); } catch(e){}
-  try { renderList && renderList(); } catch(e){}
-  console.log('✅ Firebase ready - both phones will now sync');
+  try { if(document.getElementById('msg-list')) renderList(); } catch(e){}
+  // If jar was completed but now has messages (admin refilled), unlock it
+  try {
+    const total=getTotalMsgs(), opened=getOpenedCount();
+    if(total > 0 && opened < total) {
+      renderLockedJarState(false);
+    } else if(total > 0 && opened >= total) {
+      renderLockedJarState(true);
+    }
+  } catch(e){}
+  console.log('✅ Firebase loaded — messages:', getTotalMsgs());
 }).catch(e => {
   console.warn('Firebase load failed, using local data:', e);
-  // Still works offline with localStorage
 });
 
 // ══════════════════════════════════════════
@@ -1072,19 +1080,26 @@ function flyAndOpen(callback){
   const ov=document.getElementById('letter-overlay');
   const jar=document.getElementById('jar-scene');
   const rb=jar.getBoundingClientRect();
-  const sx=rb.left+rb.width/2,sy=rb.top+rb.height*0.25;
+  const sx=rb.left+rb.width/2, sy=rb.top+rb.height*0.25;
   const scroll=document.createElement('div');
   scroll.style.cssText=`position:fixed;left:${sx}px;top:${sy}px;z-index:510;pointer-events:none;
-    width:24px;height:8px;border-radius:4px;background:#e8d5b7;border:1px solid rgba(139,90,43,.4);
-    box-shadow:0 0 16px rgba(55,138,221,.7);transform:translate(-50%,-50%) scale(1);transition:none`;
+    width:22px;height:8px;border-radius:4px;background:#e8d5b7;border:1px solid rgba(55,138,221,.5);
+    box-shadow:0 0 18px rgba(55,138,221,.8);transform:translate(-50%,-50%);transition:none`;
   ov.appendChild(scroll);
+  // fast grow and fly to center
+  requestAnimationFrame(()=>{
+    scroll.style.transition='all .5s cubic-bezier(.22,1,.36,1)';
+    scroll.style.width='180px';
+    scroll.style.height='60px';
+    scroll.style.borderRadius='8px';
+    scroll.style.transform=`translate(calc(${window.innerWidth/2-sx}px - 50%), calc(${window.innerHeight/2-sy}px - 50%))`;
+    scroll.style.boxShadow='0 0 50px rgba(55,138,221,.8)';
+  });
+  // fade out then run callback
   setTimeout(()=>{
-    scroll.style.transition='all .65s cubic-bezier(.22,1,.36,1)';
-    scroll.style.width='190px';scroll.style.height='65px';scroll.style.borderRadius='7px';
-    scroll.style.transform=`translate(calc(${window.innerWidth/2-sx}px - 50%),calc(${window.innerHeight/2-sy}px - 50%)) scale(1)`;
-    scroll.style.boxShadow='0 0 55px rgba(55,138,221,.75)';
-  },100);
-  setTimeout(()=>{scroll.style.opacity='0';setTimeout(()=>{scroll.remove();callback();},260);},900);
+    scroll.style.opacity='0';
+    setTimeout(()=>{ scroll.remove(); callback(); }, 200);
+  }, 550);
 }
 
 // ── CATEGORIES ──
@@ -1093,31 +1108,55 @@ const catLabels={sad:"😔 for when you're sad",missyou:"❤️ for when you mis
 function pickCat(cat){
   curCat=cat;
   jarClick();
-  setTimeout(()=>flyAndOpen(()=>openLetter(cat)),180);
+  // small delay so jar shake animation starts
+  setTimeout(()=>flyAndOpen(()=>openLetter(cat)), 300);
 }
 function magicPick(){
-  const voices=getVoices(),photos=getPhotos(),mems=getMems();
+  // re-read from localStorage every time (Firebase may have loaded new data)
+  const voices=getVoices(), photos=getPhotos(), mems=getMems();
   const r=Math.random();
   let type='msg';
-  if(voices.length>0&&r<0.08)type='voice';
-  else if(photos.length>0&&r>=0.08&&r<0.22)type='photo';
-  else if(mems.length>0&&r>=0.22&&r<0.40)type='mem';
+  if(voices.length>0 && r<0.08) type='voice';
+  else if(photos.length>0 && r>=0.08 && r<0.25) type='photo';
+  else if(mems.length>0 && r>=0.25 && r<0.45) type='mem';
   const cats=['sad','missyou','smile','memory','motivation','cuteness'];
   const cat=cats[Math.floor(Math.random()*cats.length)];
-  curCat=type==='msg'?cat:'__'+type+'__';
+  curCat = type==='msg' ? cat : '__'+type+'__';
   jarClick();
   setTimeout(()=>flyAndOpen(()=>{
-    if(type==='voice'){const v=getVoices();if(v.length)openLetterVoice(v[Math.floor(Math.random()*v.length)]);}
-    else if(type==='photo'){const p=getPhotos();if(p.length)openLetterPhoto(p[Math.floor(Math.random()*p.length)]);}
-    else if(type==='mem'){const m=getMems();if(m.length)openLetterMem(m[Math.floor(Math.random()*m.length)]);}
-    else openLetter(cat);
-  }),180);
+    // re-read again inside callback to get latest Firebase data
+    const v2=getVoices(), p2=getPhotos(), m2=getMems();
+    if(type==='voice' && v2.length) openLetterVoice(v2[Math.floor(Math.random()*v2.length)]);
+    else if(type==='photo' && p2.length) openLetterPhoto(p2[Math.floor(Math.random()*p2.length)]);
+    else if(type==='mem' && m2.length) openLetterMem(m2[Math.floor(Math.random()*m2.length)]);
+    else { curCat=cat; openLetter(cat); }
+  }), 300);
 }
 
 // ── OPEN LETTER ──
-function openLetter(cat){const msg=pickFromPool(cat);showLetterScreen(msg.split('|').map(s=>s.trim()).filter(Boolean),catLabels[cat]||cat);}
+function openLetter(cat){
+  const msgs=getMsgs();
+  const available=(msgs[cat]||DEF[cat]||[]);
+  if(!available.length){
+    // No messages in this category — show a default
+    showLetterScreen(["Hey…","I haven't written anything here yet|But I'm thinking of you 💙"], catLabels[cat]||cat);
+    return;
+  }
+  const msg=pickFromPool(cat);
+  showLetterScreen(msg.split('|').map(s=>s.trim()).filter(Boolean), catLabels[cat]||cat);
+}
 function openLetterMem(text){showLetterRaw(`<p class="mem-lbl">📸 a little memory</p><p class="mem-text">${text}</p>`,'📸 a little memory')}
-function openLetterPhoto(obj){showLetterRaw(`<img class="letter-photo" src="${obj.src}" alt="memory"/><p class="photo-cap">${obj.caption||'A moment I never want to forget 💙'}</p>`,'📸 a little memory')}
+function openLetterPhoto(obj){
+  if(!obj || !obj.src){ openLetter('memory'); return; } // fallback if no photo
+  showLetterRaw(`
+    <div style="text-align:center">
+      <img class="letter-photo" src="${obj.src}" alt="memory"
+        onerror="this.style.display='none'"
+        style="width:100%;max-width:280px;border-radius:10px;border:2px solid rgba(139,90,43,.2);box-shadow:0 4px 20px rgba(0,0,0,.25);margin:0 auto 12px;display:block"/>
+      <p class="photo-cap" style="font-family:'Caveat',cursive;font-size:1.1rem;color:var(--paper-ink2);line-height:1.6">${obj.caption||'A moment I never want to forget 💙'}</p>
+    </div>
+  `,'📸 a little memory');
+}
 function openLetterVoice(src){showLetterRaw(`<div style="text-align:center;padding:12px 0"><div style="font-size:2rem;margin-bottom:10px">🎧</div><p class="voice-hand">I recorded something… just for you 💙<br/>press play when you're ready</p><audio controls src="${src}"></audio></div>`,'🎧 a surprise')}
 
 function showLetterScreen(steps,badge){
@@ -1142,7 +1181,14 @@ function showLetterRaw(html,badge){
   document.getElementById('letter-badge').textContent=badge||'for you';
   document.getElementById('letter-lines').innerHTML=html;
   document.getElementById('letter-sign').classList.remove('visible');
-  animLetter(ls);recordOpen('magic');checkCompletion();
+  // show sign after small delay for photos/voice
+  setTimeout(()=>{
+    const sign=document.getElementById('letter-sign');
+    if(sign) sign.classList.add('visible');
+  }, 800);
+  animLetter(ls);
+  recordOpen(curCat&&curCat.startsWith('__') ? curCat.replace(/__/g,'') : (curCat||'magic'));
+  checkCompletion();
 }
 function animLetter(ls){
   ls.classList.add('show');
@@ -1153,15 +1199,24 @@ function closeLetter(){document.getElementById('letter-screen').classList.remove
 function markHelped(){closeLetter()}
 function pickAnother(){
   document.getElementById('letter-screen').classList.remove('show');
+  // shake jar again and animate
+  jarClick();
   setTimeout(()=>{
-    if(curCat.startsWith('__')){
-      const t=curCat.replace(/__/g,'');
-      if(t==='voice'){const v=getVoices();if(v.length)openLetterVoice(v[Math.floor(Math.random()*v.length)]);return}
-      if(t==='photo'){const p=getPhotos();if(p.length)openLetterPhoto(p[Math.floor(Math.random()*p.length)]);return}
-      if(t==='mem'){const m=getMems();if(m.length)openLetterMem(m[Math.floor(Math.random()*m.length)]);return}
-    }
-    openLetter(curCat);
-  },280);
+    flyAndOpen(()=>{
+      if(curCat && curCat.startsWith('__')){
+        const t=curCat.replace(/__/g,'');
+        const v=getVoices(),p=getPhotos(),m=getMems();
+        if(t==='voice' && v.length){ openLetterVoice(v[Math.floor(Math.random()*v.length)]); return; }
+        if(t==='photo' && p.length){ openLetterPhoto(p[Math.floor(Math.random()*p.length)]); return; }
+        if(t==='mem'   && m.length){ openLetterMem(m[Math.floor(Math.random()*m.length)]); return; }
+        // fallback if that type is empty
+        const cats=['sad','missyou','smile','memory','motivation','cuteness'];
+        openLetter(cats[Math.floor(Math.random()*cats.length)]);
+        return;
+      }
+      if(curCat) openLetter(curCat);
+    });
+  }, 300);
 }
 
 // ── HISTORY + TRACKING ──
