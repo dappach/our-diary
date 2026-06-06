@@ -1418,29 +1418,51 @@ function updMem(j,id,f,v){ const d=getD(); const m=(d[getMemKey(j)]||[]).find(x=
 
 function addGalleryItem(){ const d=getD(); d.gtecGallery=d.gtecGallery||[]; d.gtecGallery.push({id:'gal'+Date.now(),imgUrl:'',caption:''}); saveD(d); D=d; renderAdminLists(); }
 function delGallery(id){ const d=getD(); d.gtecGallery=(d.gtecGallery||[]).filter(g=>g.id!==id); saveD(d); D=d; renderAdminLists(); }
-function updGallery(id,f,v){ const d=getD(); const g=(d.gtecGallery||[]).find(x=>x.id===id); if(g){g[f]=v;saveD(d);D=d;} }
+function updGallery(id,f,v){
+  const d=getD(); const g=(d.gtecGallery||[]).find(x=>x.id===id);
+  if(g){ g[f]=v; saveD(d); D=d; }
+}
 
 function addSecret(){ const d=getD(); d.secrets=d.secrets||[]; if(d.secrets.length>=6)return; d.secrets.push({id:'sec'+Date.now(),icon:'⭐',msg:''}); saveD(d); D=d; renderAdminLists(); }
 function delSecret(id){ const d=getD(); d.secrets=(d.secrets||[]).filter(s=>s.id!==id); saveD(d); D=d; renderAdminLists(); }
 function updSecret(id,f,v){ const d=getD(); const s=(d.secrets||[]).find(x=>x.id===id); if(s){s[f]=v;saveD(d);D=d;} }
 
 function collectMemories(j){
-  return Array.from(document.querySelectorAll(`[data-mem-journey="${j}"]`)).map(el=>({
-    id:el.dataset.memId,
-    date:el.querySelector('[data-f="date"]').value,
-    title:el.querySelector('[data-f="title"]').value,
-    text:el.querySelector('[data-f="text"]').value,
-    mood:el.querySelector('[data-f="mood"]').value,
-    imgUrl:el.querySelector('[data-f="imgUrl"]').value,
-    voice:el.querySelector('[data-f="voice"]').value,
-  }));
+  // Read from live D store (images saved via updMem don't use input fields)
+  const d = getD();
+  const key = getMemKey(j);
+  // Also merge any text field updates from the DOM
+  const domEls = Array.from(document.querySelectorAll(`[data-mem-journey="${j}"]`));
+  domEls.forEach(el => {
+    const id = el.dataset.memId;
+    const mem = (d[key]||[]).find(m=>m.id===id);
+    if(!mem) return;
+    const dateEl  = el.querySelector('[data-f="date"]');
+    const titleEl = el.querySelector('[data-f="title"]');
+    const textEl  = el.querySelector('[data-f="text"]');
+    const moodEl  = el.querySelector('[data-f="mood"]');
+    const voiceEl = el.querySelector('[data-f="voice"]');
+    if(dateEl)  mem.date  = dateEl.value;
+    if(titleEl) mem.title = titleEl.value;
+    if(textEl)  mem.text  = textEl.value;
+    if(moodEl)  mem.mood  = moodEl.value;
+    if(voiceEl) mem.voice = voiceEl.value;
+    // imgUrl is already saved by uploadImgForMem — don't overwrite
+  });
+  return d[key]||[];
 }
 function collectGallery(){
-  return Array.from(document.querySelectorAll('[data-gal-id]')).map(el=>({
-    id:el.dataset.galId,
-    imgUrl:el.querySelector('[data-gf="imgUrl"]').value,
-    caption:el.querySelector('[data-gf="caption"]').value,
-  }));
+  const d = getD();
+  const domEls = Array.from(document.querySelectorAll('[data-gal-id]'));
+  domEls.forEach(el => {
+    const id = el.dataset.galId;
+    const gal = (d.gtecGallery||[]).find(g=>g.id===id);
+    if(!gal) return;
+    const capEl = el.querySelector('[data-gf="caption"]');
+    if(capEl) gal.caption = capEl.value;
+    // imgUrl saved by uploadImgForGallery
+  });
+  return d.gtecGallery||[];
 }
 function collectSecrets(){
   return Array.from(document.querySelectorAll('[data-sec-id]')).map(el=>({
