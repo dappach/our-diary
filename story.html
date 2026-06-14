@@ -457,72 +457,53 @@ footer p{font-family:'Cormorant Garamond',serif;font-size:1.05rem;font-style:ita
   .float-quote{position:relative;margin-bottom:14px}
 }
 </style>
-<!-- Firebase SDK -->
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getFirestore, doc, setDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
-const firebaseConfig = {
+<!-- Firebase SDK (CDN compat version - works with normal scripts) -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script>
+// ── FIREBASE INIT ──
+const fbApp = firebase.initializeApp({
   apiKey: "AIzaSyB0YJSRJTPryKzupAfIePq_ycFPVSLbkTQ",
   authDomain: "our-diary-mh.firebaseapp.com",
   projectId: "our-diary-mh",
   storageBucket: "our-diary-mh.firebasestorage.app",
   messagingSenderId: "289304289773",
   appId: "1:289304289773:web:a021aa72601ec8222f87e4"
-};
-
-const fbApp = initializeApp(firebaseConfig);
-const db = getFirestore(fbApp);
+});
+const db = firebase.firestore();
 const STORY_DOC = 'story_data_v2';
 
-// Save story data to Firebase
-window.fbSaveStory = async function(data) {
-  try {
-    await setDoc(doc(db, 'story_data', STORY_DOC), { value: JSON.stringify(data) });
-  } catch(e) { console.warn('Firebase save error:', e); }
+window.fbSaveStory = function(data) {
+  db.collection('story_data').doc(STORY_DOC).set({ value: JSON.stringify(data) })
+    .catch(e => console.warn('Firebase save error:', e));
 };
 
-// Load story data from Firebase
-window.fbLoadStory = async function() {
-  try {
-    const snap = await getDoc(doc(db, 'story_data', STORY_DOC));
-    if (snap.exists()) {
+window.fbLoadStory = function() {
+  return db.collection('story_data').doc(STORY_DOC).get().then(snap => {
+    if(snap.exists) {
       const data = JSON.parse(snap.data().value);
       localStorage.setItem('story_data_v2', JSON.stringify(data));
       return data;
     }
-  } catch(e) { console.warn('Firebase load error:', e); }
-  return null;
+    return null;
+  }).catch(e => { console.warn('Firebase load error:', e); return null; });
 };
 
-// Convert image file to base64 and return it
-window.fileToBase64 = function(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = e => resolve(e.target.result);
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
-};
-
-// Load from Firebase on startup, then listen for changes
+// Load on startup
 window.fbLoadStory().then(data => {
-  if (data && window.applyFirebaseData) {
-    window.applyFirebaseData(data);
-  }
+  if(data && window.applyFirebaseData) window.applyFirebaseData(data);
 });
 
-// Listen for real-time changes from admin phone
-onSnapshot(doc(db, 'story_data', STORY_DOC), (snap) => {
-  if (snap.exists()) {
+// Listen for real-time updates
+db.collection('story_data').doc(STORY_DOC).onSnapshot(snap => {
+  if(snap.exists) {
     try {
       const data = JSON.parse(snap.data().value);
       localStorage.setItem('story_data_v2', JSON.stringify(data));
-      if (window.applyFirebaseData) window.applyFirebaseData(data);
-    } catch(e) {}
+      if(window.applyFirebaseData) window.applyFirebaseData(data);
+    } catch(e){}
   }
 });
-
 </script>
 </head>
 <body>
@@ -1328,21 +1309,29 @@ function closeAdminGate(){ document.getElementById('admin-gate').classList.remov
 document.getElementById('admin-pw').addEventListener('keydown',e=>{ if(e.key==='Enter') tryAdmin(); });
 function tryAdmin(){ if(document.getElementById('admin-pw').value===getPass()){ closeAdminGate(); openAdminPanel(); } else { document.getElementById('admin-err').textContent='wrong password ✗'; document.getElementById('admin-pw').value=''; } }
 
+function safeSet(id, val){
+  const el = document.getElementById(id);
+  if(el && el.tagName !== 'BUTTON') {
+    if(el.type === 'checkbox') el.checked = !!val;
+    else el.value = val || '';
+  }
+}
 function openAdminPanel(){
-  D=getD();
-  document.getElementById('ap-school-hero').value=D.schoolHero||'';
-  document.getElementById('ap-school-intro').value=D.schoolIntro||'';
-  document.getElementById('ap-gtec-hero').value=D.gtecHero||'';
-  document.getElementById('ap-gtec-intro').value=D.gtecIntro||'';
-  document.getElementById('ap-float-quotes').value=(D.floatQuotes||[]).join('\n');
-  document.getElementById('ap-present-intro').value=D.presentIntro||'';
-  document.getElementById('ap-live-quotes').value=(D.liveQuotes||[]).join('\n');
-  document.getElementById('ap-letters').value=(D.letters||[]).join('\n');
-  document.getElementById('ap-final-img').value=D.finalImg||'';
-  document.getElementById('ap-final-quote').value=D.finalQuote||'';
-  document.getElementById('ap-ambient-url').value=D.ambientUrl||'';
-  document.getElementById('ap-audio-auto').checked=!!D.audioAuto;
-  document.getElementById('ap-intro-quote').value=D.introQuote||'';
+  D = getD();
+  safeSet('ap-school-intro', D.schoolIntro);
+  safeSet('ap-gtec-intro',   D.gtecIntro);
+  safeSet('ap-float-quotes', (D.floatQuotes||[]).join('\n'));
+  safeSet('ap-present-intro',D.presentIntro);
+  safeSet('ap-live-quotes',  (D.liveQuotes||[]).join('\n'));
+  safeSet('ap-letters',      (D.letters||[]).join('\n'));
+  safeSet('ap-final-quote',  D.finalQuote);
+  safeSet('ap-ambient-url',  D.ambientUrl);
+  safeSet('ap-audio-auto',   D.audioAuto);
+  safeSet('ap-intro-quote',  D.introQuote);
+  // Show existing hero/final image previews
+  if(D.schoolHero){ const p=document.getElementById('ap-school-hero-prev'); if(p) p.textContent='✅ photo set'; }
+  if(D.gtecHero){   const p=document.getElementById('ap-gtec-hero-prev');   if(p) p.textContent='✅ photo set'; }
+  if(D.finalImg){   const p=document.getElementById('ap-final-img-prev');   if(p) p.textContent='✅ photo set'; }
   document.querySelectorAll('.w-btn').forEach(b=>b.classList.remove('active'));
   const wb=document.getElementById('wb-'+(D.weather||'off')); if(wb) wb.classList.add('active');
   renderAdminLists();
